@@ -99,7 +99,7 @@ erstelleMenu
 importantLog "Methode dynamisch rufen"
 callKeyFunktion "a"
 
-function pushMaster() {
+function pushActual() {
    echo "Gerufen!"
 }
 

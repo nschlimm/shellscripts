@@ -6,6 +6,7 @@ select choice in \
     "To local workspace hausrat-service" \
     "To local workspace import-service" \
     "To local workspace historisierung-lib" \
+    "To local shellscripts" \
     "Quit"
 
 do
@@ -32,6 +33,11 @@ do
         ;;
         5)
             cd /Users/niklasschlimm/workspaces/carriertech/historisierung-lib
+            break
+
+        ;;
+        5)
+            cd /Users/niklasschlimm/Personal
             break
 
         ;;
