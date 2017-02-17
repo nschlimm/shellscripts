@@ -35,10 +35,10 @@ echo "a. Push actual (fetch, merge, commit, push)"
 echo "b. Merge actual from actual origin, merge development branch to actual, push actual to origin"
 echo "c. Merge actual from actual origin"
 echo "e. Set upstream to actual"
-echo "f. Working with diffs"
 echo "g. Administer remotes"
 echo "h. Interactive push"
 echo "i. Show repository history"
+echo "j. Clone remote repository"
 echo
 echo "Working on local branches:"
 echo "k. New local branch, checkout (branch, checkout, optional: push set-upstream)"
@@ -48,6 +48,7 @@ echo "n. Delete local branch"
 echo "o. Merge from source branch to target branch"
 echo "p. Show all branches (incl. remote)"
 echo "r. Show branch history"
+echo "f. Working with diffs"
 echo
 echo "Other usefull actions:"
 echo "u. Stash: save local changes and bring head to working dir"
@@ -57,6 +58,7 @@ echo "Git admin actions:"
 echo "1. Show local git config"
 echo "2. Show global git config"
 echo "3. Administering aliases"
+echo "4. Show .gitignore"
 echo
 echo "[Ctrl]+P Change project"
 echo "[Ctrl]+B Change branch"
@@ -68,6 +70,11 @@ actual=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
 importantLog $actual 
 git log --decorate --oneline -n 1
 git status | grep "Your branch"
+wstat=$(git diff --shortstat)
+if [ -z "$wstat" ]; then
+    wstat="clean"
+fi
+echo "Working directory vs. actual checkout: $wstat"
 echo
 git remote -v
 git remote show origin | grep "  $actual"
@@ -256,6 +263,10 @@ echo
             vim ~/.gitconfig
 
         ;;
+        "4")
+            vim .gitignore
+
+        ;;
         "n")
             git branch
             echo "Welchen Branch löschen?"
@@ -358,7 +369,7 @@ echo
 
         ;;
         $'\x10')
-            . ~/fl.sh
+            . ~/Personal/fl.sh
         ;;
         $'\x02')
             git branch --all
@@ -368,6 +379,14 @@ echo
         ;;
         $'\x06')
             git fetch --all
+        ;;
+        "j")
+            echo "Where?"
+            . ~/Personal/fl.sh
+            echo "Remote repository url:"
+            read url
+            git clone $url
+         
         ;;
         "q")
             echo $'\nbye bye\n'

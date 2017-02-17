@@ -36,12 +36,12 @@ do
             break
 
         ;;
-        5)
+        6)
             cd /Users/niklasschlimm/Personal
             break
 
         ;;
-        6)
+        7)
             break
         ;;
     esac
