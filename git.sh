@@ -1,4 +1,5 @@
 #!/bin/sh
+source menu.sh
 
 function drillDown () {
    while true; do
@@ -8,7 +9,7 @@ function drillDown () {
      then
         echo "Enter filename"
         read fname
-        if [ $# -eq 1 ]
+        if [ $# -eq 1 ]å
           then
             git diff $1 $fname
         fi
@@ -28,71 +29,7 @@ function importantLog() {
    echo -e -n '\033[0m'
 }
 
-while true; do
-clear
-echo "Working with remotes:"
-echo "a. Push actual (fetch, merge, commit, push)"
-echo "b. Merge actual from actual origin, merge development branch to actual, push actual to origin"
-echo "c. Merge actual from actual origin"
-echo "e. Set upstream to actual"
-echo "g. Administer remotes"
-echo "h. Interactive push"
-echo "i. Show repository history"
-echo "j. Clone remote repository"
-echo
-echo "Working on local branches:"
-echo "k. New local branch, checkout (branch, checkout, optional: push set-upstream)"
-echo "l. Rollback head to last commit"
-echo "m. Override working dir with head (you loose the changes!)"
-echo "n. Delete local branch"
-echo "o. Merge from source branch to target branch"
-echo "p. Show all branches (incl. remote)"
-echo "r. Show branch history"
-echo "f. Working with diffs"
-echo
-echo "Other usefull actions:"
-echo "u. Stash: save local changes and bring head to working dir"
-echo "v. Stash pop: revert last stash"
-echo
-echo "Git admin actions:"
-echo "1. Show local git config"
-echo "2. Show global git config"
-echo "3. Administering aliases"
-echo "4. Show .gitignore"
-echo
-echo "[Ctrl]+P Change project"
-echo "[Ctrl]+B Change branch"
-echo "[Ctrl]+F Fetch all remotes"
-echo
-git fetch --all 2> /dev/null
-importantLog $(pwd | grep -o "[^/]*$")
-actual=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
-importantLog $actual 
-git log --decorate --oneline -n 1
-git status | grep "Your branch"
-wstat=$(git diff --shortstat)
-if [ -z "$wstat" ]; then
-    wstat="clean"
-fi
-echo "Working directory vs. actual checkout: $wstat"
-echo
-git remote -v
-git remote show origin | grep "  $actual"
-echo
-read -p "Make your choice: " -n 1 -r
-echo
-
-#COLUMNS=100
-#PS3='Please enter your choice: '
-#select choice in  \
-#    "Historie des aktuellen branch anzeigen" \
-#    "Historie des repositories anzeigen lassen" \
-#    "Alle Branches anzeigen lassen (auch von remote)" \
-#    "Quit"
-#do
-    case $REPLY in
-#    case $choice in
-        "a")
+function pushActual() {
             git merge origin/$actual
             echo -e -n "\033[1;36m$prompt"
             echo "Status after merge"
@@ -106,22 +43,9 @@ echo
                    git commit -m "$cmsg"
                    git push origin $actual
             fi      
+}
 
-        ;;
-        "k")
-            echo "Name des neuen Branch?"
-            read branchname
-            git branch $branchname 
-            git checkout $branchname
-            read -p "Set upstream? " -n 1 -r
-            echo    # (optional) move to a new line
-            if [[ $REPLY =~ ^[Yy]$ ]]
-                then
-                   git push --set-upstream origin $branchname
-            fi      
-
-        ;;
-        "b")
+function mergeActualFromDevBranch() {
             git merge origin/$actual              # to update the state to the latest remote master state
             git branch
             echo "Enter local branch name to merge into actual"
@@ -146,13 +70,124 @@ echo
               fi      
             fi      
 
+}
 
-        ;;
-        "e")
-            git push --set-upstream origin $actual
-        ;;
-        "f")
-            echo "Everything fetched from remote to local archive."
+function mergeActualFromOrigin() {
+  git fetch 
+  git merge origin/$actual
+}
+
+function setUpstream() {
+  git fetch 
+  git merge origin/$actual
+}
+
+function adminRemotes() {
+              echo
+            echo "Administer remotes:"
+            echo "a. Show remotes"
+            echo "b. Add remote"
+            echo "c. Inspect remote"
+            echo
+            read -p "Make your choice: " -n 1 -r subreply
+            echo
+
+            case $subreply in
+                "a")
+                   echo $'\nKnown remotes:'
+                   git remote -v
+                ;;
+                "b")
+                    echo "What is the adress?"
+                    read adress
+                    echo "Type an alias for this remote?"
+                    read ralias
+                    git remote add $ralias $adress
+                ;;
+                "c")
+                    git remote -v
+                    echo "Name of the remote to inspect"
+                    read rname
+                    git remote show $rname
+                ;;
+            esac
+
+}
+
+function showRepoHisto() {
+            git log --pretty=format:'%Cred%h%Creset | %Cgreen%ad%Creset | %s %C(yellow)%d%Creset %C(bold blue)[%an]%Creset %Cgreen(%cr)%Creset' --graph --date=short --all
+}
+
+function cloneRemote() {
+            echo "Where?"
+            . ~/Personal/fl.sh
+            echo "Remote repository url:"
+            read url
+            git clone $url
+}
+
+function newLocalBranch() {
+              echo "Name des neuen Branch?"
+            read branchname
+            git branch $branchname 
+            git checkout $branchname
+            read -p "Set upstream? " -n 1 -r
+            echo    # (optional) move to a new line
+            if [[ $REPLY =~ ^[Yy]$ ]]
+                then
+                   git push --set-upstream origin $branchname
+            fi      
+}
+
+function rollBackLast() {
+            git reset HEAD~1
+            read -p "Override updates in local working dir? " -n 1 -r
+            echo    # (optional) move to a new line
+            if [[ $REPLY =~ ^[Yy]$ ]]
+                then
+                    git reset HEAD --hard
+            fi      
+}
+
+function deleteBranch() {
+              git branch
+            echo "Welchen Branch löschen?"
+            read dbranch
+            git branch -d $dbranch
+            read -p "Delete remote? " -n 1 -r
+            echo    # (optional) move to a new line
+            if [[ $REPLY =~ ^[Yy]$ ]]
+                then
+                   git push origin --delete $dbranch
+            fi 
+}
+
+function mergeSourceToTarget(){
+              git branch
+            echo "Enter merge target branch"
+            read target
+            echo "Enter merge source branch"
+            read bsource
+            git checkout $target
+            git merge $bsource
+}
+
+function showAllBranches () {
+              git branch --all
+}
+
+function showBranchHisto(){
+              git branch 
+            echo "Select branch (hit enter for actual):"
+            read bname
+            if [[ ! -z "$bname" ]]; then
+                  git checkout $bname
+            fi
+            git log --pretty=format:'%Cred%h%Creset | %Cgreen%ad%Creset | %s %C(yellow)%d%Creset %C(bold blue)[%an]%Creset %Cgreen(%cr)%Creset' --graph --date=short
+}
+
+function workingDiffs() {
+              echo "Everything fetched from remote to local archive."
             echo 
             echo "Working with diffs:"
             echo "a. Show diff between <actual branch> HEAD and <origin/actual branch> HEAD"
@@ -221,66 +256,29 @@ echo
                     drillDown $actual $cnameb
                 ;;
             esac
+}
 
-        ;;
-        "l")
-            git reset HEAD~1
-            read -p "Override updates in local working dir? " -n 1 -r
-            echo    # (optional) move to a new line
-            if [[ $REPLY =~ ^[Yy]$ ]]
-                then
-                    git reset HEAD --hard
-            fi      
+function setUpstream() {
+            git push --set-upstream origin $actual
+}
 
-        ;;
-        "m")
-            read -p "Override updates in local working dir? " -n 1 -r
-            echo    # (optional) move to a new line
-            if [[ $REPLY =~ ^[Yy]$ ]]
-                then
-                   git reset HEAD --hard
-            fi      
-
-        ;;
-        "u")
+function stash() {
             git stash
+}
 
-        ;;
-        "v")
+function pop() {
             git stash pop
+}
 
-        ;;
-        "c")
-            git fetch
-            git merge origin/$actual
-
-        ;;
-        "1")
+function localGitConfig() {
             vim .git/config
+}
 
-        ;;
-        "2")
+function globalGitConfig() {
             vim ~/.gitconfig
+}
 
-        ;;
-        "4")
-            vim .gitignore
-
-        ;;
-        "n")
-            git branch
-            echo "Welchen Branch löschen?"
-            read dbranch
-            git branch -d $dbranch
-            read -p "Delete remote? " -n 1 -r
-            echo    # (optional) move to a new line
-            if [[ $REPLY =~ ^[Yy]$ ]]
-                then
-                   git push origin --delete $dbranch
-            fi 
-
-        ;;
-        "3")
+function adminAliases() {
             echo $'\nActual aliases:'
             git config --get-regexp alias
             read -p "Add or delete aliases (a/d)? " -n 1 -r
@@ -298,76 +296,111 @@ echo
                     read calias
                     git config --global --unset alias.$calias
             fi      
+}
 
-        ;;
-        "o")
-            git branch
-            echo "Enter merge target branch"
-            read target
-            echo "Enter merge source branch"
-            read bsource
-            git checkout $target
-            git merge $bsource
+function gitIgnore() {
+            vim .gitignore
+}
 
-        ;;
-        "g")
-            echo
-            echo "Administer remotes:"
-            echo "a. Show remotes"
-            echo "b. Add remote"
-            echo "c. Inspect remote"
-            echo
-            read -p "Make your choice: " -n 1 -r subreply
-            echo
+keyfunktionsmap=()
 
-            case $subreply in
-                "a")
-                   echo $'\nKnown remotes:'
-                   git remote -v
-                ;;
-                "b")
-                    echo "What is the adress?"
-                    read adress
-                    echo "Type an alias for this remote?"
-                    read ralias
-                    git remote add $ralias $adress
-                ;;
-                "c")
-                    git remote -v
-                    echo "Name of the remote to inspect"
-                    read rname
-                    git remote show $rname
-                ;;
-            esac
+function menuPunkt () {
 
-        ;;
-        "i")
-            echo "What is the remote name?"
-            read rname
-            git branch
-            echo "What branch do you wish to push?"
-            read brname
-            git push $rname $brname
+   keyfunktionsmap+=("$1:$3")
+   echo "$1. $2"
 
-        ;;
-        "r")
-            git branch 
-            echo "Select branch (hit enter for actual):"
-            read bname
-            if [[ ! -z "$bname" ]]; then
-                  git checkout $bname
-            fi
-            git log --pretty=format:'%Cred%h%Creset | %Cgreen%ad%Creset | %s %C(yellow)%d%Creset %C(bold blue)[%an]%Creset %Cgreen(%cr)%Creset' --graph --date=short
+}
 
-        ;;
-        "h")
-            git log --pretty=format:'%Cred%h%Creset | %Cgreen%ad%Creset | %s %C(yellow)%d%Creset %C(bold blue)[%an]%Creset %Cgreen(%cr)%Creset' --graph --date=short --all
+function callKeyFunktion () { 
+   for i in "${keyfunktionsmap[@]}"
+     do
+       keys=${i:0:1}
+         if [ "$1" == "$keys" ]
+           then
+            method=${i:2}
+            $method
+         fi
+   done
+}
 
-        ;;
-        "p")
-            git branch --all
+function pushActual() {
+            git merge origin/$actual
+            echo -e -n "\033[1;36m$prompt"
+            echo "Status after merge"
+            echo -e -n '\033[0m'
+            read -p "Commit and push (y/n)? " -n 1 -r
+            echo    # (optional) move to a new line
+            if [[ $REPLY =~ ^[Yy]$ ]]
+                then
+                   read -p "Enter commit message:" cmsg
+                   git add .
+                   git commit -m "$cmsg"
+                   git push origin $actual
+            fi      
+}
 
-        ;;
+function makeQuit(){
+    return
+}
+
+while true; do
+echo "Working with remotes:"
+menuPunkt a "Push actual (fetch, merge, commit, push)" pushActual
+menuPunkt b "Merge actual from actual origin, merge development branch to actual, push actual to origin" mergeActualFromDevBranch
+menuPunkt c "Merge actual from actual origin" mergeActualFromOrigin
+menuPunkt e "Set upstream to actual" setUpstream
+menuPunkt g "Administer remotes" adminRemotes
+menuPunkt h "Interactive push" interactivePush
+menuPunkt i "Show repository history" showRepoHisto
+menuPunkt j "Clone remote repository" cloneRemote
+echo
+echo "Working on local branches"
+menuPunkt k "New local branch, checkout (branch, checkout, optional: push set-upstream)" newLocalBranch
+menuPunkt l "Rollback gently head to last commit" rollBackLast
+menuPunkt n "Delete local branch" deleteBranch
+menuPunkt o "Merge from source branch to target branch" mergeSourceToTarget
+menuPunkt p "Show all branches (incl. remote)" showAllBranches
+menuPunkt r "Show branch history" showBranchHisto
+menuPunkt f "Working with diffs" workingDiffs
+echo
+echo "Other usefull actions:"
+menuPunkt u "Stash: save local changes and bring head to working dir" stash
+menuPunkt v "Stash pop: revert last stash" pop
+echo
+echo "Git admin actions"
+menuPunkt 1 "Show local git config" localGitConfig
+menuPunkt 2 "Show global git config" globalGitConfig
+menuPunkt 3 "Administering aliases" adminAliases
+menuPunkt 4 "Show .gitignore" gitIgnore
+echo
+echo "Press 'q' to quit"
+echo
+echo "[Ctrl]+P Change project"
+echo "[Ctrl]+B Change branch"
+echo "[Ctrl]+F Fetch all remotes"
+echo
+git fetch --all 2> /dev/null
+importantLog $(pwd | grep -o "[^/]*$")
+actual=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
+importantLog $actual 
+git log --decorate --oneline -n 1
+git status | grep "Your branch"
+wstat=$(git diff --shortstat)
+if [ -z "$wstat" ]; then
+    wstat="clean"
+fi
+echo "Working directory vs. actual checkout: $wstat"
+echo
+git remote -v
+git remote show origin | grep "  $actual"
+
+echo
+read -p "Make your choice: " -n 1 -r
+echo
+
+callKeyFunktion $REPLY
+
+case $REPLY in
         $'\x10')
             . ~/Personal/fl.sh
         ;;
@@ -380,22 +413,11 @@ echo
         $'\x06')
             git fetch --all
         ;;
-        "j")
-            echo "Where?"
-            . ~/Personal/fl.sh
-            echo "Remote repository url:"
-            read url
-            git clone $url
-         
-        ;;
         "q")
-            echo $'\nbye bye\n'
+            echo "bye bye, homie!"
             break
-
-        ;;
-
-    esac
-    echo
-    read -p $'\n<Press any key to return>' -n 1 -r
+            ;;
+esac
+echo
+read -p $'\n<Press any key to return>' -n 1 -r
 done
-
