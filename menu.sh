@@ -56,6 +56,32 @@ function callKeyFunktion () {
    done
 }
 
+function erstelleMenuSchnell () {
+   keyfunktionsmap=()
+   counter=0
+   acounter=0
+   menucount=${#menus[@]}
+   while [ $counter -lt 4 ]; do
+       echo $(getMenuName "\${menus[$counter]}")
+       menuindex=${menus[$counter]:0:2}
+       while true; do
+          untermenuindex=${menuitems[$acounter]:0:2}
+          if [ "$untermenuindex" -eq "$menuindex" ]
+           then
+              key=$(echo $(getKeyForAction "\${menuitems[$acounter]}"))
+              funktion=$(echo $(getMenuFunktionsName "\${menuitems[$acounter]}"))
+              keyfunktionsmap+=("$key:$funktion")
+              echo $(getUntermenuName "\${menuitems[$acounter]}")
+           else
+            break
+          fi
+          ((acounter++))
+       done
+       ((counter++))
+       echo
+   done
+}
+
 function erstelleMenu(){
    keyfunktionsmap=()
    counter=0
@@ -80,3 +106,4 @@ function erstelleMenu(){
        echo
    done
 }
+

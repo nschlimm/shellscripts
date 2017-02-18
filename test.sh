@@ -302,48 +302,83 @@ function gitIgnore() {
             vim .gitignore
 }
 
-menus=()
-menuitems=()
+keyfunktionsmap=()
 
-menus+=('00:Working with remotes:')
+function menuPunkt () {
 
-menuitems+=('00:a. Push actual (fetch, merge, commit, push)#pushActual')
-menuitems+=('00:b. Merge actual from actual origin, merge development branch to actual, push actual to origin#mergeActualFromDevBranch')
-menuitems+=('00:c. Merge actual from actual origin#mergeActualFromOrigin')
-menuitems+=('00:e. Set upstream to actual#setUpstream')
-menuitems+=('00:g. Administer remotes#adminRemotes')
-menuitems+=('00:h. Interactive push#interactivePush')
-menuitems+=('00:i. Show repository history#showRepoHisto')
-menuitems+=('00:j. Clone remote repository#cloneRemote')
+   keyfunktionsmap+=("$1:$3")
+   echo "$1. $2"
 
-menus+=('01:Working on local branches:')
+}
 
-menuitems+=('01:k. New local branch, checkout (branch, checkout, optional: push set-upstream)#newLocalBranch')
-menuitems+=('01:l. Rollback gently head to last commit#rollBackLast')
-menuitems+=('01:n. Delete local branch#deleteBranch')
-menuitems+=('01:o. Merge from source branch to target branch#mergeSourceToTarget')
-menuitems+=('01:p. Show all branches (incl. remote)#showAllBranches')
-menuitems+=('01:r. Show branch history#showBranchHisto')
-menuitems+=('01:f. Working with diffs#workingDiffs')
+function callKeyFunktion () { 
+   for i in "${keyfunktionsmap[@]}"
+     do
+       keys=${i:0:1}
+         if [ "$1" == "$keys" ]
+           then
+            method=${i:2}
+            $method
+         fi
+   done
+}
 
-menus+=('02:Other usefull actions:')
+function pushActual() {
+            git merge origin/$actual
+            echo -e -n "\033[1;36m$prompt"
+            echo "Status after merge"
+            echo -e -n '\033[0m'
+            read -p "Commit and push (y/n)? " -n 1 -r
+            echo    # (optional) move to a new line
+            if [[ $REPLY =~ ^[Yy]$ ]]
+                then
+                   read -p "Enter commit message:" cmsg
+                   git add .
+                   git commit -m "$cmsg"
+                   git push origin $actual
+            fi      
+}
 
-menuitems+=('02:u. Stash: save local changes and bring head to working dir#stash')
-menuitems+=('02:v. Stash pop: revert last stash#pop')
-
-menus+=('03:Git admin actions:')
-
-menuitems+=('03:1. Show local git config#localGitConfig')
-menuitems+=('03:2. Show global git config#globalGitConfig')
-menuitems+=('03:3. Administering aliases#adminAliases')
-menuitems+=('03:4. Show .gitignore#gitIgnore')
-
+function makeQuit(){
+	return
+}
 
 while true; do
-clear
-
-erstelleMenuSchnell
-
+echo "Working with remotes:"
+menuPunkt a "Push actual (fetch, merge, commit, push)" pushActual
+menuPunkt b "Merge actual from actual origin, merge development branch to actual, push actual to origin" mergeActualFromDevBranch
+menuPunkt c "Merge actual from actual origin" mergeActualFromOrigin
+menuPunkt e "Set upstream to actual" setUpstream
+menuPunkt g "Administer remotes" adminRemotes
+menuPunkt h "Interactive push" interactivePush
+menuPunkt i "Show repository history" showRepoHisto
+menuPunkt j "Clone remote repository" cloneRemote
+echo
+echo "Working on local branches"
+menuPunkt k "New local branch, checkout (branch, checkout, optional: push set-upstream)" newLocalBranch
+menuPunkt l "Rollback gently head to last commit" rollBackLast
+menuPunkt n "Delete local branch" deleteBranch
+menuPunkt o "Merge from source branch to target branch" mergeSourceToTarget
+menuPunkt p "Show all branches (incl. remote)" showAllBranches
+menuPunkt r "Show branch history" showBranchHisto
+menuPunkt f "Working with diffs" workingDiffs
+echo
+echo "Other usefull actions:"
+menuPunkt u "Stash: save local changes and bring head to working dir" stash
+menuPunkt v "Stash pop: revert last stash" pop
+echo
+echo "Git admin actions"
+menuPunkt 1 "Show local git config" localGitConfig
+menuPunkt 2 "Show global git config" globalGitConfig
+menuPunkt 3 "Administering aliases" adminAliases
+menuPunkt 4 "Show .gitignore" gitIgnore
+echo
+echo "Press 'q' to quit"
+echo
+echo "[Ctrl]+P Change project"
+echo "[Ctrl]+B Change branch"
+echo "[Ctrl]+F Fetch all remotes"
+echo
 git fetch --all 2> /dev/null
 importantLog $(pwd | grep -o "[^/]*$")
 actual=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
@@ -358,14 +393,15 @@ echo "Working directory vs. actual checkout: $wstat"
 echo
 git remote -v
 git remote show origin | grep "  $actual"
+
 echo
 read -p "Make your choice: " -n 1 -r
 echo
 
-     callKeyFunktion $REPLY
+callKeyFunktion $REPLY
 
-    case $REPLY in
-        $'\x10')
+case $REPLY in
+	    $'\x10')
             . ~/Personal/fl.sh
         ;;
         $'\x02')
@@ -378,15 +414,9 @@ echo
             git fetch --all
         ;;
         "q")
-            echo $'\nbye bye\n'
-            break
-
-        ;;
-
-
-    esac
-
-    echo
-    read -p $'\n<Press any key to return>' -n 1 -r
+			break
+			;;
+esac
+echo
+read -p $'\n<Press any key to return>' -n 1 -r
 done
-
