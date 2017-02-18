@@ -242,12 +242,14 @@ menuPunkt n "Delete local branch" deleteBranch
 menuPunkt o "Merge from source branch to target branch" mergeSourceToTarget
 menuPunkt p "Show all branches (incl. remote)" showAllBranches
 menuPunkt r "Show branch history" showBranchHisto
+echo
+echo "Navigating around commits:"
 menuPunkt l "Rollback head to last commit" rollBackLast
 menuPunkt m "Undo reset commands" undoReset
 menuPunkt s "Working with diffs" workingDiffs
-menuPunkt t "Interactively staging files" interactiveStage
 echo
 echo "Other usefull actions:"
+menuPunkt t "Interactively staging files" interactiveStage
 menuPunkt u "Stash: save local changes and bring head to working dir" stash
 menuPunkt v "Stash pop: revert last stash" pop
 echo
