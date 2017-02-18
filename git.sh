@@ -5,7 +5,14 @@ source $supergithome/flexmenu.sh
 function analyzeWorkingDir (){
    wstat=$(git diff HEAD --shortstat) # analyze local dir working status vs. actual checkout
    if [ -z "$wstat" ]; then
-      wstat="clean"
+      wstat="tracked files clean"
+   fi
+   untracked=$(git ls-files --others --exclude-standard)
+   if [ -z "$untracked" ]; then
+      wstat="$wstat (no untracked files present)"
+    else
+      filescount=$(git ls-files --others --exclude-standard | wc -l)
+      wstat="$wstat (WARN: $filescount untracked file(s) present)"
    fi
    echo "Working directory vs. HEAD: $wstat"
    echo
@@ -30,6 +37,15 @@ function pushActual() {
        echo "... nothing to merge ... up to date"
     fi
     importantLog "Checking for stuff to commit and push in working tree"
+    # check to see if untracked files are in working tree
+    if git ls-files --others --exclude-standard | grep -q ".*"; then
+      echo "... untracked files found ..."
+      read -p "Add all untracked (y/n)? " -n 1 -r
+      echo    # (optional) move to a new line
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+         git add .
+      fi
+    fi
     if git diff HEAD --name-status | grep -q ".*"; then
       echo "... found updates in working tree ..."
       git diff HEAD --name-status
@@ -209,7 +225,7 @@ function makeQuit(){
 }
 
 function undoReset () {
-  git reflog
+  git reflog --date=iso
   echo "Choose commit to reset:"
   read cname
   if [ -z "$cname" ]; then
