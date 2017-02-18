@@ -1,4 +1,5 @@
 #!/bin/sh
+supergithome=~/Personal
 source flexmenu.sh
 
 function drillDown () {

@@ -46,6 +46,7 @@ function pushActual() {
          git add .
       fi
     fi
+    # check to see if updated tracked files are in working tree
     if git diff HEAD --name-status | grep -q ".*"; then
       echo "... found updates in working tree ..."
       git diff HEAD --name-status
@@ -265,7 +266,7 @@ menuPunkt m "Undo reset commands" undoReset
 menuPunkt s "Working with diffs" workingDiffs
 echo
 echo "Other usefull actions:"
-menuPunkt t "Interactively staging files" interactiveStage
+menuPunkt t "Interactively staging/unstaging files" interactiveStage
 menuPunkt u "Stash: save local changes and bring head to working dir" stash
 menuPunkt v "Stash pop: revert last stash" pop
 echo
