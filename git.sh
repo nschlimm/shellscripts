@@ -3,11 +3,11 @@ supergithome=~/Personal
 source $supergithome/flexmenu.sh
 
 function analyzeWorkingDir (){
-   wstat=$(git diff --shortstat) # analyze local dir working status vs. actual checkout
+   wstat=$(git diff HEAD --shortstat) # analyze local dir working status vs. actual checkout
    if [ -z "$wstat" ]; then
       wstat="clean"
    fi
-   echo "Working directory vs. actual checkout: $wstat"
+   echo "Working directory vs. HEAD: $wstat"
    echo
 }
 
@@ -30,9 +30,9 @@ function pushActual() {
        echo "... nothing to merge ... up to date"
     fi
     importantLog "Checking for stuff to commit and push in working tree"
-    if git diff --name-status | grep -q ".*"; then
+    if git diff HEAD --name-status | grep -q ".*"; then
       echo "... found updates in working tree ..."
-      git diff --name-status
+      git diff HEAD --name-status
       read -p "Commit and push those updates (y/n)? " -n 1 -r
       echo    # (optional) move to a new line
       if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -229,7 +229,7 @@ while true; do
 clear
 keyfunktionsmap=()
 echo "Working with remotes:"
-menuPunkt a "Push actual (fetch, merge, commit, push)" pushActual
+menuPunkt a "Gently push actual" pushActual
 menuPunkt c "Merge actual from actual origin" mergeActualFromOrigin
 menuPunkt d "Clone remote repository" cloneRemote
 menuPunkt e "Set upstream to actual" setUpstream
