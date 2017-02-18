@@ -1,4 +1,6 @@
 #!/bin/sh
+supergithome=~/Personal
+source $supergithome/flexmenu.sh
 
 function analyzeWorkingDir (){
    wstat=$(git diff --shortstat) # analyze local dir working status vs. actual checkout
@@ -9,95 +11,39 @@ function analyzeWorkingDir (){
    echo
 }
 
-function menuPunkt () {
-
-   keyfunktionsmap+=("$1:$3")
-   echo "$1. $2"
-
-}
-
-function callKeyFunktion () { 
-   for i in "${keyfunktionsmap[@]}"
-     do
-       keys=${i:0:1}
-         if [ "$1" == "$keys" ]
-           then
-            method=${i:2}
-            clear
-            $method
-         fi
-   done
-}
-
-function drillDown () {
-   while true; do
-     read -p "Drill down into file (y/n)? " -n 1 -r
-     echo    # (optional) move to a new line                    if [[ $REPLY =~ ^[Yy]$ ]]
-     if [[ $REPLY =~ ^[Yy]$ ]]
-     then
-        echo "Enter filename"
-        read fname
-        if [ $# -eq 1 ]
-          then
-            git diff $1 $fname
-        fi
-        if [ $# -eq 2 ]
-          then
-            git diff $1:$fname $2:$fname
-        fi
-     else
-        break
-     fi
-   done
-}
-
-function importantLog() {
-   echo -e -n "\033[1;36m$prompt"
-   echo $1
-   echo -e -n '\033[0m'
-}
-
 function pushActual() {
-            git merge origin/$actual
-            echo -e -n "\033[1;36m$prompt"
-            echo "Status after merge"
-            echo -e -n '\033[0m'
-            read -p "Commit and push (y/n)? " -n 1 -r
-            echo    # (optional) move to a new line
-            if [[ $REPLY =~ ^[Yy]$ ]]
-                then
-                   read -p "Enter commit message:" cmsg
-                   git add .
-                   git commit -m "$cmsg"
-                   git push origin $actual
-            fi      
-}
-
-function mergeActualFromDevBranch() {
-            git merge origin/$actual              # to update the state to the latest remote master state
-            git branch
-            echo "Enter local branch name to merge into actual"
-            read localbranchname
-            read -p "Merge $localbranchname into $actual (y/n)?" -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]
-             then
-              git merge $localbranchname      # to bring changes to actual from your branch
-              echo -e -n "\033[1;36m$prompt"
-              echo "Status after merge"
-              echo -e -n '\033[0m'
-              git status -s
-              read -p "Push to remote master (y/n)?" -n 1 -r
-              echo
-              if [[ $REPLY =~ ^[Yy]$ ]]
-                  then
-                      echo "Enter commit message"
-                      read cmsg
-                      git commit -am $cmsg
-                      git push 
-              fi      
-            fi      
-
+  importantLog "Checking your head state"
+  if git status | grep -q "HEAD detached"; then
+     echo "... you seem to be on a detached head state ... can't push ..."
+  else
+    echo "... your HEAD is attached to $actual ..."
+    importantLog "Checking for updates from origin/$actual"
+    if git diff $actual origin/$actual | grep -q ".*"; then
+       echo "... found updates in origin/$actual ..."
+       git diff --name-status $actual origin/actual
+       read -p "Merge (y/n)? " -n 1 -r
+       echo    # (optional) move to a new line
+       if [[ $REPLY =~ ^[Yy]$ ]]; then
+          git merge origin/$actual
+       fi
+    else
+       echo "... nothing to merge ... up to date"
+    fi
+    importantLog "Checking for stuff to commit and push in working tree"
+    if git diff --name-status | grep -q ".*"; then
+      echo "... found updates in working tree ..."
+      git diff --name-status
+      read -p "Commit and push those updates (y/n)? " -n 1 -r
+      echo    # (optional) move to a new line
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+           read -p "Enter commit message:" cmsg
+           git commit -am "$cmsg"
+           git push origin $actual
+      fi
+    else
+      echo "... nothing to commit ..."
+    fi
+  fi
 }
 
 function mergeActualFromOrigin() {
@@ -144,6 +90,7 @@ function showRepoHisto() {
 function cloneRemote() {
             echo "Where?"
             . ~/Personal/fl.sh
+            pwd
             echo "Remote repository url:"
             read url
             git clone $url
@@ -210,79 +157,11 @@ function showBranchHisto(){
 }
 
 function workingDiffs() {
-            echo "Everything fetched from remote to local archive."
-            echo 
-            echo "Working with diffs:"
-            echo "a. Show diff between <actual branch> HEAD and <origin/actual branch> HEAD"
-            echo "b. Show diff actual working dir vs. HEAD"
-            echo "c. Show diff between actual working dir and other commits"
-            echo "d. Show diff between two abitrary commits"
-            echo "e. Show diff between two abitrary branch HEADs"
-            echo "f. Show diff between actual working dir an stage"
-            echo "g. Show diff between actual branch and another branch"
-            echo "h. Show commits"
-            echo
-            read -p "Make your choice: " -n 1 -r subreply
-            echo
-
-            case $subreply in
-                "a")
-                    git diff --name-status $actual origin/$actual
-                    drillDown $actual origin/$actual
-                ;;
-                "b")
-                    git diff --name-status HEAD
-                    drillDown "HEAD"
-                ;;
-                "f")
-                    git diff --name-status
-                ;;
-                "h")
-                    echo "How many commits?"
-                    read hmany
-                    git log --pretty=format:"%h - %an, %ar : %s" -n $hmany
-                ;;
-                "c")
-                    echo "Last 15 commits"
-                    git log --pretty=format:"%h - %an, %ar : %s" -n 15
-                    echo "Enter commit name"
-                    read cname
-                    git diff --name-status $cname
-                    drillDown $cname
-                ;;
-                "d")
-                    echo "Last 15 commits"
-                    git log --pretty=format:"%h - %an, %ar : %s" -n 15
-                    echo "(a) Enter 'baseline' commit name"
-                    read cnamea
-                    echo "(b) Enter second commit name"
-                    read cnameb
-                    git diff --name-status $cnamea $cnameb
-                    drillDown $cnamea $cnameb
-                ;;
-                "e")
-                    echo "Branches"
-                    git branch --all
-                    echo "(a) Enter 'branch' name"
-                    read cnamea
-                    echo "(b) Enter second branch name"
-                    read cnameb
-                    git diff --name-status $cnamea $cnameb
-                    drillDown $cnamea $cnameb
-                ;;
-                "g")
-                    echo "Branches"
-                    git branch --all
-                    echo "Enter 'branch' name"
-                    read cnamea
-                    git diff --name-status $actual $cnamea
-                    drillDown $actual $cnameb
-                ;;
-            esac
+  . $supergithome/diff.sh
 }
 
 function setUpstream() {
-            git push --set-upstream origin $actual
+   git branch --set-upstream-to=origin/$actual
 }
 
 function stash() {
@@ -329,27 +208,44 @@ function makeQuit(){
     return
 }
 
+function undoReset () {
+  git reflog
+  echo "Choose commit to reset:"
+  read cname
+  if [ -z "$cname" ]; then
+    echo "No commit entered!"
+  else
+    git reset $cname
+  fi
+}
+
+function interactiveStage () {
+   git add -i
+}
+
+git fetch --all 2> /dev/null
+
 while true; do
 clear
 keyfunktionsmap=()
 echo "Working with remotes:"
 menuPunkt a "Push actual (fetch, merge, commit, push)" pushActual
-menuPunkt b "Merge dev branch to actual and push to origin" mergeActualFromDevBranch
 menuPunkt c "Merge actual from actual origin" mergeActualFromOrigin
+menuPunkt d "Clone remote repository" cloneRemote
 menuPunkt e "Set upstream to actual" setUpstream
-menuPunkt g "Administer remotes" adminRemotes
-menuPunkt h "Interactive push" interactivePush
-menuPunkt i "Show repository history" showRepoHisto
-menuPunkt j "Clone remote repository" cloneRemote
+menuPunkt f "Administer remotes" adminRemotes
+menuPunkt g "Show repository history" showRepoHisto
 echo
 echo "Working on local branches:"
 menuPunkt k "New local branch, checkout" newLocalBranch
-menuPunkt l "Rollback gently head to last commit" rollBackLast
 menuPunkt n "Delete local branch" deleteBranch
 menuPunkt o "Merge from source branch to target branch" mergeSourceToTarget
 menuPunkt p "Show all branches (incl. remote)" showAllBranches
 menuPunkt r "Show branch history" showBranchHisto
-menuPunkt f "Working with diffs" workingDiffs
+menuPunkt l "Rollback head to last commit" rollBackLast
+menuPunkt m "Undo reset commands" undoReset
+menuPunkt s "Working with diffs" workingDiffs
+menuPunkt t "Interactively staging files" interactiveStage
 echo
 echo "Other usefull actions:"
 menuPunkt u "Stash: save local changes and bring head to working dir" stash
@@ -367,7 +263,6 @@ echo "[Ctrl]+P Change project"
 echo "[Ctrl]+B Change branch"
 echo "[Ctrl]+F Fetch all remotes"
 echo
-git fetch --all 2> /dev/null
 importantLog $(pwd | grep -o "[^/]*$")
 actual=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
 importantLog $actual 
@@ -375,7 +270,6 @@ git log --decorate --oneline -n 1
 git status | grep "Your branch"
 analyzeWorkingDir
 git remote -v
-git remote show origin | grep "  $actual"
 
 echo
 read -p "Make your choice: " -n 1 -r
