@@ -1,5 +1,33 @@
 #!/bin/sh
-source menu.sh
+
+function analyzeWorkingDir (){
+   wstat=$(git diff --shortstat) # analyze local dir working status vs. actual checkout
+   if [ -z "$wstat" ]; then
+      wstat="clean"
+   fi
+   echo "Working directory vs. actual checkout: $wstat"
+   echo
+}
+
+function menuPunkt () {
+
+   keyfunktionsmap+=("$1:$3")
+   echo "$1. $2"
+
+}
+
+function callKeyFunktion () { 
+   for i in "${keyfunktionsmap[@]}"
+     do
+       keys=${i:0:1}
+         if [ "$1" == "$keys" ]
+           then
+            method=${i:2}
+            clear
+            $method
+         fi
+   done
+}
 
 function drillDown () {
    while true; do
@@ -9,7 +37,7 @@ function drillDown () {
      then
         echo "Enter filename"
         read fname
-        if [ $# -eq 1 ]å
+        if [ $# -eq 1 ]
           then
             git diff $1 $fname
         fi
@@ -73,11 +101,6 @@ function mergeActualFromDevBranch() {
 }
 
 function mergeActualFromOrigin() {
-  git fetch 
-  git merge origin/$actual
-}
-
-function setUpstream() {
   git fetch 
   git merge origin/$actual
 }
@@ -187,7 +210,7 @@ function showBranchHisto(){
 }
 
 function workingDiffs() {
-              echo "Everything fetched from remote to local archive."
+            echo "Everything fetched from remote to local archive."
             echo 
             echo "Working with diffs:"
             echo "a. Show diff between <actual branch> HEAD and <origin/actual branch> HEAD"
@@ -302,51 +325,16 @@ function gitIgnore() {
             vim .gitignore
 }
 
-keyfunktionsmap=()
-
-function menuPunkt () {
-
-   keyfunktionsmap+=("$1:$3")
-   echo "$1. $2"
-
-}
-
-function callKeyFunktion () { 
-   for i in "${keyfunktionsmap[@]}"
-     do
-       keys=${i:0:1}
-         if [ "$1" == "$keys" ]
-           then
-            method=${i:2}
-            $method
-         fi
-   done
-}
-
-function pushActual() {
-            git merge origin/$actual
-            echo -e -n "\033[1;36m$prompt"
-            echo "Status after merge"
-            echo -e -n '\033[0m'
-            read -p "Commit and push (y/n)? " -n 1 -r
-            echo    # (optional) move to a new line
-            if [[ $REPLY =~ ^[Yy]$ ]]
-                then
-                   read -p "Enter commit message:" cmsg
-                   git add .
-                   git commit -m "$cmsg"
-                   git push origin $actual
-            fi      
-}
-
 function makeQuit(){
     return
 }
 
 while true; do
+clear
+keyfunktionsmap=()
 echo "Working with remotes:"
 menuPunkt a "Push actual (fetch, merge, commit, push)" pushActual
-menuPunkt b "Merge actual from actual origin, merge development branch to actual, push actual to origin" mergeActualFromDevBranch
+menuPunkt b "Merge dev branch to actual and push to origin" mergeActualFromDevBranch
 menuPunkt c "Merge actual from actual origin" mergeActualFromOrigin
 menuPunkt e "Set upstream to actual" setUpstream
 menuPunkt g "Administer remotes" adminRemotes
@@ -354,8 +342,8 @@ menuPunkt h "Interactive push" interactivePush
 menuPunkt i "Show repository history" showRepoHisto
 menuPunkt j "Clone remote repository" cloneRemote
 echo
-echo "Working on local branches"
-menuPunkt k "New local branch, checkout (branch, checkout, optional: push set-upstream)" newLocalBranch
+echo "Working on local branches:"
+menuPunkt k "New local branch, checkout" newLocalBranch
 menuPunkt l "Rollback gently head to last commit" rollBackLast
 menuPunkt n "Delete local branch" deleteBranch
 menuPunkt o "Merge from source branch to target branch" mergeSourceToTarget
@@ -367,7 +355,7 @@ echo "Other usefull actions:"
 menuPunkt u "Stash: save local changes and bring head to working dir" stash
 menuPunkt v "Stash pop: revert last stash" pop
 echo
-echo "Git admin actions"
+echo "Git admin actions:"
 menuPunkt 1 "Show local git config" localGitConfig
 menuPunkt 2 "Show global git config" globalGitConfig
 menuPunkt 3 "Administering aliases" adminAliases
@@ -385,12 +373,7 @@ actual=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
 importantLog $actual 
 git log --decorate --oneline -n 1
 git status | grep "Your branch"
-wstat=$(git diff --shortstat)
-if [ -z "$wstat" ]; then
-    wstat="clean"
-fi
-echo "Working directory vs. actual checkout: $wstat"
-echo
+analyzeWorkingDir
 git remote -v
 git remote show origin | grep "  $actual"
 
@@ -400,24 +383,26 @@ echo
 
 callKeyFunktion $REPLY
 
+# CTRL-Key commands
 case $REPLY in
-        $'\x10')
-            . ~/Personal/fl.sh
-        ;;
-        $'\x02')
-            git branch --all
-            echo "Which branch?"
-            read bname
-            git checkout $bname
-        ;;
-        $'\x06')
-            git fetch --all
-        ;;
-        "q")
-            echo "bye bye, homie!"
-            break
-            ;;
+    $'\x10')
+       . ~/Personal/fl.sh
+    ;;
+    $'\x02')
+       git branch --all
+       echo "Which branch?"
+       read bname
+       git checkout $bname
+    ;;
+    $'\x06')
+       git fetch --all
+    ;;
+    "q")
+       echo "bye bye, homie!"
+       break
+    ;;
 esac
+
 echo
 read -p $'\n<Press any key to return>' -n 1 -r
 done
