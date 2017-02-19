@@ -40,7 +40,8 @@ function pushActual() {
     # check to see if untracked files are in working tree
     if git ls-files --others --exclude-standard | grep -q ".*"; then
       echo "... untracked files found ..."
-      read -p "Add all untracked (y/n)? " -n 1 -r
+      git ls-files --others --exclude-standard
+      read -p "Add all those untracked (y/n)? " -n 1 -r
       echo    # (optional) move to a new line
       if [[ $REPLY =~ ^[Yy]$ ]]; then
          git add .
@@ -54,7 +55,7 @@ function pushActual() {
       echo    # (optional) move to a new line
       if [[ $REPLY =~ ^[Yy]$ ]]; then
            read -p "Enter commit message:" cmsg
-           git commit -am "$cmsg"
+           git commit -am "$cmsg" # stage and commit all tracked files
            git push origin $actual
       fi
     else
@@ -240,6 +241,10 @@ function interactiveStage () {
    git add -i
 }
 
+function atlassiansView() {
+  . $supergithome/atlassian.sh
+}
+
 git fetch --all 2> /dev/null
 
 while true; do
@@ -260,15 +265,16 @@ menuPunkt o "Merge from source branch to target branch" mergeSourceToTarget
 menuPunkt p "Show all branches (incl. remote)" showAllBranches
 menuPunkt r "Show branch history" showBranchHisto
 echo
-echo "Navigating around commits:"
+echo "Navigating commit pointers:"
 menuPunkt l "Rollback head to last commit" rollBackLast
 menuPunkt m "Undo reset commands" undoReset
-menuPunkt s "Working with diffs" workingDiffs
 echo
 echo "Other usefull actions:"
+menuPunkt s "Working with diffs" workingDiffs
 menuPunkt t "Interactively staging/unstaging files" interactiveStage
 menuPunkt u "Stash: save local changes and bring head to working dir" stash
 menuPunkt v "Stash pop: revert last stash" pop
+menuPunkt w "Atlassian's view" atlassiansView
 echo
 echo "Git admin actions:"
 menuPunkt 1 "Show local git config" localGitConfig
@@ -282,13 +288,7 @@ echo "[Ctrl]+P Change project"
 echo "[Ctrl]+B Change branch"
 echo "[Ctrl]+F Fetch all remotes"
 echo
-importantLog $(pwd | grep -o "[^/]*$")
-actual=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
-importantLog $actual 
-git log --decorate --oneline -n 1
-git status | grep "Your branch"
-analyzeWorkingDir
-git remote -v
+showStatus
 
 echo
 read -p "Make your choice: " -n 1 -r
