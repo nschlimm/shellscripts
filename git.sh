@@ -41,15 +41,14 @@ function pushActual() {
     if git ls-files --others --exclude-standard | grep -q ".*"; then
       echo "... untracked files found ..."
       git ls-files --others --exclude-standard
-      drillDownAdvanced "git ls-files --others --exclude-standard" ".*" HEAD
-      read -p "Add all those untracked (y/n)? " -n 1 -r
+      read -p "Add all (y/n)? " -n 1 -r
       echo    # (optional) move to a new line
       if [[ $REPLY =~ ^[Yy]$ ]]; then
          git add .
       fi
     fi
     # check to see if updated tracked files are in working tree
-    if git status -s | grep -q ".*"; then
+    if git diff HEAD --name-status; then
       echo "... found updates in working tree ..."
       git status -s
       drillDownAdvanced "git diff HEAD --name-status" " .*" HEAD
