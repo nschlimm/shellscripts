@@ -2,26 +2,9 @@
 supergithome=~/Personal
 source flexmenu.sh
 
-function drillDown () {
-   while true; do
-     read -p "Drill down into file (y/n)? " -n 1 -r
-     echo    # (optional) move to a new line                    if [[ $REPLY =~ ^[Yy]$ ]]
-     if [[ $REPLY =~ ^[Yy]$ ]]
-     then
-        echo "Enter filename"
-        read fname
-        if [ $# -eq 1 ]
-          then
-            git diff $1 $fname
-        fi
-        if [ $# -eq 2 ]
-          then
-            git diff $1:$fname $2:$fname
-        fi
-     else
-        break
-     fi
-   done
+function numberedList () {
+  kommando="$1"
+
 }
 
 function headHead () {
@@ -30,8 +13,9 @@ function headHead () {
 }
 
 function dirHead () {
+   importantLog "Comparing working tree to HEAD"
    git diff --name-status HEAD
-   drillDown "HEAD"
+   drillDownAdvanced "git diff --name-status HEAD" "[ ].*$" "HEAD"
 }
 
 function treeCommit () {

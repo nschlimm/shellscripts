@@ -68,3 +68,61 @@ function executeCommand () {
  $1
  importantLog "Finished execution of '$1'"
 }
+
+function drillDown () {
+   while true; do
+     read -p "Drill down into file (y/n)? " -n 1 -r
+     echo    # (optional) move to a new line                    if [[ $REPLY =~ ^[Yy]$ ]]
+     if [[ $REPLY =~ ^[Yy]$ ]]
+     then
+        echo "Enter filename"
+        read fname
+        if [ $# -eq 1 ]
+          then
+            git diff $1 $fname
+        fi
+        if [ $# -eq 2 ]
+          then
+            git diff $1:$fname $2:$fname
+        fi
+     else
+        break
+     fi
+   done
+}
+
+function drillDownAdvanced () { # list kommando; regexp to select filename; baseline object name; other object name
+
+  kommando="$1"
+  regexp="$2"
+
+   while true; do
+     read -p "Continue with drill down into file (y/n)? " -n 1 -r
+     echo    # (optional) move to a new line                    if [[ $REPLY =~ ^[Yy]$ ]]
+     if [[ $REPLY =~ ^[Yy]$ ]]
+     then
+        
+        $kommando | nl
+        echo "Select line:"
+        read linenumber
+        selected=$($kommando | sed -n ${linenumber}p)
+
+        fname=$(echo $selected | grep -oh "$regexp" | sed "s/ //g")
+
+        echo "... selected $fname"
+
+        if [ $# -eq 3 ]
+          then
+            executeCommand "git diff $3 $fname"
+        fi
+        if [ $# -eq 4 ]
+          then
+            executeCommand "git diff $3:$fname $4:$fname"
+        fi
+
+     else
+        break
+     fi
+   done
+}
+
