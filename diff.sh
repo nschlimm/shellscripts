@@ -8,14 +8,13 @@ function numberedList () {
 }
 
 function headHead () {
-   git diff --name-status $actual origin/$actual
-   drillDown $actual origin/$actual
+   importantLog "Comparing $actual HEAD to $actual/origin HEAD"
+   diffDrillDownAdvanced "git diff --name-status $actual origin/$actual" "[ ].*$" "$actual" "origin/$actual"
 }
 
 function dirHead () {
    importantLog "Comparing working tree to HEAD"
-   git diff --name-status HEAD
-   drillDownAdvanced "git diff --name-status HEAD" "[ ].*$" "HEAD"
+   diffDrillDownAdvanced "git diff --color --name-status HEAD" "[ ].*$" "HEAD"
 }
 
 function treeCommit () {
@@ -23,28 +22,22 @@ function treeCommit () {
    git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -n 15
    echo "Enter commit name"
    read cname
-   git diff --name-status $cname
-   drillDown $cname
-
+   diffDrillDownAdvanced "git diff --name-status $cname" "[ ].*$" "$cname"
 }
 
 function treeStage () {
-   git diff --name-status  
-   commit=$(git show --oneline -s | grep -o ".* ")
-   drillDown $commit
-	
+   commit=$(git show --oneline -s | grep -o "[a-z0-9]*")
+   diffDrillDownAdvanced "git diff --name-status $commit" "[ ].*$" "$commit"	
 }
 
 function commitCommit () {
    echo "Last 15 commits"
-   git log --pretty=format:"%h - %an, %ar : %s" -n 15
+   git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -n 15
    echo "(a) Enter 'baseline' commit name"
    read cnamea
    echo "(b) Enter second commit name"
    read cnameb
-   git diff --name-status $cnamea $cnameb
-   drillDown $cnamea $cnameb
-	
+   diffDrillDownAdvanced "git diff --name-status $cnamea $cnameb" "[ ].*$" "$cnamea" "$cnameb"
 }
 
 function branchBranch () {
@@ -54,9 +47,7 @@ function branchBranch () {
    read cnamea
    echo "(b) Enter second branch name"
    read cnameb
-   git diff --name-status $cnamea $cnameb
-   drillDown $cnamea $cnameb
-	
+   diffDrillDownAdvanced "git diff --name-status $cnamea $cnameb" "[ ].*$" "$cnamea" "$cnameb"	
 }
 
 function actualHeadbranchHead () {
@@ -64,16 +55,13 @@ function actualHeadbranchHead () {
     git branch --all
     echo "Enter 'branch' name"
     read cnamea
-    git diff --name-status $actual $cnamea
-    drillDown $actual $cnameb
-	
+    diffDrillDownAdvanced "git diff --name-status $actual $cnamea" "[ ].*$" "$actual" "$cnamea"  
 }
 
 function showCommits () {
     echo "How many commits?"
     read hmany
     git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -n $hmany
-	
 }
 
 git fetch --all

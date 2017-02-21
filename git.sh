@@ -48,10 +48,9 @@ function pushActual() {
       fi
     fi
     # check to see if updated tracked files are in working tree
-    if git diff HEAD --name-status; then
+    if git diff HEAD --name-status | grep -q ".*"; then
       echo "... found updates in working tree ..."
-      git status -s
-      drillDownAdvanced "git diff HEAD --name-status" " .*" HEAD
+      diffDrillDownAdvanced "git status -s" " .*" HEAD
       read -p "Commit and push the updates (y/n)? " -n 1 -r
       echo    # (optional) move to a new line
       if [[ $REPLY =~ ^[Yy]$ ]]; then

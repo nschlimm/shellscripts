@@ -65,7 +65,7 @@ function breakOnNo () {
 
 function executeCommand () {
  importantLog "Executing: '$1'"
- $1
+ eval $1
  importantLog "Finished execution of '$1'"
 }
 
@@ -79,11 +79,11 @@ function drillDown () {
         read fname
         if [ $# -eq 1 ]
           then
-            git diff $1 $fname
+            git diff --color $1 $fname | diff-so-fancy
         fi
         if [ $# -eq 2 ]
           then
-            git diff $1:$fname $2:$fname
+            git diff --color $1:$fname $2:$fname | diff-so-fancy
         fi
      else
         break
@@ -91,21 +91,23 @@ function drillDown () {
    done
 }
 
-function drillDownAdvanced () { # list kommando; regexp to select filename; baseline object name; other object name
+function diffDrillDownAdvanced () { # list kommando; regexp to select filename from list command; baseline object name; other object name
 
-  kommando="$1"
+  listkommando="$1"
   regexp="$2"
 
+  if $listkommando | grep -q ".*"; then
    while true; do
-     read -p "Continue with drill down into file (y/n)? " -n 1 -r
-     echo    # (optional) move to a new line                    if [[ $REPLY =~ ^[Yy]$ ]]
-     if [[ $REPLY =~ ^[Yy]$ ]]
-     then
         
-        $kommando | nl
-        echo "Select line:"
+        importantLog "Drill down into file diff: $listkommando"
+
+        eval $listkommando | nl -n 'ln' -s " "
+        echo "Select line or 'q' to exit drilldown:"
         read linenumber
-        selected=$($kommando | sed -n ${linenumber}p)
+        if [ "$linenumber" = "q" ]; then
+          break
+        fi
+        selected=$($listkommando | sed -n ${linenumber}p)
 
         fname=$(echo $selected | grep -oh "$regexp" | sed "s/ //g")
 
@@ -113,16 +115,23 @@ function drillDownAdvanced () { # list kommando; regexp to select filename; base
 
         if [ $# -eq 3 ]
           then
-            executeCommand "git diff $3 $fname"
+             kommando="git diff --color $3 $fname | diff-so-fancy"
+             executeCommand "$kommando"
         fi
         if [ $# -eq 4 ]
           then
-            executeCommand "git diff $3:$fname $4:$fname"
+             kommando="git diff --color $3 $4 $fname | diff-so-fancy"
+             executeCommand "$kommando"
         fi
 
-     else
-        break
-     fi
+        read -p $'\n<Press any key to return>' -n 1 -r
+        if [ "$REPLY" = "c" ]; then
+           clear
+        fi        
+
    done
+
+  fi
+
 }
 
