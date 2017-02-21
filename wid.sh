@@ -4,6 +4,7 @@ options=( "Versteckte Dateien in Finder sehen"
           "Verzeichnisbaum" 
           "Diff so fancy" 
           "Brew" 
+          "Mergetool"
           "Quit")
 select opt in "${options[@]}"
 do
@@ -26,6 +27,13 @@ do
             /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
             ;;
 
+        "Mergetool")
+            # Tell system when Xcode utilities live:
+            sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+            
+            # Set "opendiff" as the default mergetool globally:
+            git config --global merge.tool opendiff
+            ;;
         "Quit")
             break
             ;;
