@@ -21,7 +21,7 @@ echo "Atlassians view on GIT, https://de.atlassian.com/git/tutorials"
 echo 
 echo "Working on your local repository"
 menuPunkt a "Setting up a repository" settingUp
-menuPunkt b "Saving changes" 
+menuPunkt b "Saving changes" savingChanges
 menuPunkt c "Inspecting a repository" 
 menuPunkt d "Undoing changes" 
 menuPunkt e "Rewriting history" 

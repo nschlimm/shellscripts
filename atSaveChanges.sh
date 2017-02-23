@@ -2,7 +2,25 @@
 supergithome=~/Personal
 source flexmenu.sh
 
-# all your menu actions here
+function interStage () {
+	git add -p
+}
+
+function addAllGently () {
+  if git ls-files --others --exclude-standard | grep -q ".*"; then
+     echo "... untracked files found ..."
+     git ls-files --others --exclude-standard
+     read -p "Add all (y/n)? " -n 1 -r
+     echo    # (optional) move to a new line
+     if [[ $REPLY =~ ^[Yy]$ ]]; then
+        git add .
+     fi
+  fi
+}
+
+function commitAllChanges () {
+  git commit -a 
+}
 
 git fetch --all
 
@@ -11,8 +29,9 @@ clear
 keyfunktionsmap=()
 
 echo "Saving changes"
-menuPunkt a "actual HEAD vs. origin/actual branch HEAD  -> repository vs. repository" headHead
-menuPunkt b "actual working dir   vs. HEAD              -> tree vs. repository" dirHead
+menuPunkt a "Git add all gently" addAllGently
+menuPunkt b "Git interactive staging detail session" interStage
+menuPunkt c "Gently commit a snapshot of all changes in the working directory" commitAllChanges
 echo
 showStatus
 choice
