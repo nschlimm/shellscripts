@@ -245,6 +245,21 @@ function atlassiansView() {
   . $supergithome/atlassian.sh
 }
 
+function changeProject () {
+  . ~/Personal/fl.sh
+}
+
+function changeBranch () {
+       git branch --all
+       echo "Which branch?"
+       read bname
+       git checkout $bname
+}
+
+function fetachAll () {
+       git fetch --all
+}
+
 git fetch --all 2> /dev/null
 
 while true; do
@@ -282,40 +297,10 @@ menuPunkt 2 "Show global git config" globalGitConfig
 menuPunkt 3 "Administering aliases" adminAliases
 menuPunkt 4 "Show .gitignore" gitIgnore
 echo
-echo "Press 'q' to quit"
-echo
-echo "[Ctrl]+P Change project"
-echo "[Ctrl]+B Change branch"
-echo "[Ctrl]+F Fetch all remotes"
+menuPunkt P "Change project" changeProject
+menuPunkt B "Change branch" changeBranch
+menuPunkt F "Fetch all" adminAliases
 echo
 showStatus
-
-echo
-read -p "Make your choice: " -n 1 -r
-echo
-
-callKeyFunktion $REPLY
-
-# CTRL-Key commands
-case $REPLY in
-    $'\x10')
-       . ~/Personal/fl.sh
-    ;;
-    $'\x02')
-       git branch --all
-       echo "Which branch?"
-       read bname
-       git checkout $bname
-    ;;
-    $'\x06')
-       git fetch --all
-    ;;
-    "q")
-       echo "bye bye, homie!"
-       break
-    ;;
-esac
-
-echo
-read -p $'\n<Press any key to return>' -n 1 -r
+choice
 done

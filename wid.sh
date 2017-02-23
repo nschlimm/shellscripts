@@ -1,10 +1,11 @@
 PS3='Please enter your choice: '
 options=( "Versteckte Dateien in Finder sehen" 
-          "Maven analyze dependencies" 
           "Verzeichnisbaum" 
           "Diff so fancy" 
           "Brew" 
+          "Difftool"
           "Mergetool"
+          "git-extras"
           "Quit")
 select opt in "${options[@]}"
 do
@@ -33,6 +34,19 @@ do
             
             # Set "opendiff" as the default mergetool globally:
             git config --global merge.tool opendiff
+
+        "Difftool")
+            echo "Paste the following code:"
+            echo "#!/bin/sh" 
+            echo "/usr/bin/opendiff \"$2\" \"$5\" -merge \"$1\""
+            # Make the bash script executable:
+            vi ~/bin/git-diff-cmd.sh
+            chmod +x ~/bin/git-diff-cmd.sh
+            # Tell Git (globally) to run our bash script when 'git diff' is issued:
+            git config --global diff.external ~/bin/git-diff-cmd.sh
+            ;;
+        "git-extras")
+            brew install git-extras
             ;;
         "Quit")
             break

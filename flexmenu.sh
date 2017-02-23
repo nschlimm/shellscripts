@@ -91,6 +91,24 @@ function drillDown () {
    done
 }
 
+function selectItem () {
+  listkommando="$1"
+  regexp="$2"
+  eval $listkommando | nl -n 'ln' -s " "
+  echo "Select line or 'q' to exit drilldown:"
+  read linenumber
+  if [ "$linenumber" = "q" ]; then
+    break
+  fi
+  if [ -z "$linenumber" ]; then
+     selected=""
+   else
+     selected=$($listkommando | sed -n ${linenumber}p)
+  fi
+  fname=$(echo $selected | grep -oh "$regexp" | sed "s/ //g")
+  echo "... selected $fname"
+}
+
 function diffDrillDownAdvanced () { # list kommando; regexp to select filename from list command; baseline object name; other object name
 
   listkommando="$1"
@@ -101,17 +119,7 @@ function diffDrillDownAdvanced () { # list kommando; regexp to select filename f
         
         importantLog "Drill down into file diff: $listkommando"
 
-        eval $listkommando | nl -n 'ln' -s " "
-        echo "Select line or 'q' to exit drilldown:"
-        read linenumber
-        if [ "$linenumber" = "q" ]; then
-          break
-        fi
-        selected=$($listkommando | sed -n ${linenumber}p)
-
-        fname=$(echo $selected | grep -oh "$regexp" | sed "s/ //g")
-
-        echo "... selected $fname"
+        selectItem "$listkommando" "$regexp"
 
         if [ $# -eq 3 ]
           then
@@ -133,5 +141,30 @@ function diffDrillDownAdvanced () { # list kommando; regexp to select filename f
 
   fi
 
+}
+
+function choice () {
+  echo
+  echo "Press 'q' to quit"
+  echo
+  read -p "Make your choice: " -n 1 -r
+  echo
+
+  case $REPLY in 
+    "q" )
+       echo "bye, bye, homie!"
+       break
+      ;;
+  esac
+  
+  callKeyFunktion $REPLY
+
+  echo
+  read -p $'\n<Press any key to return>' -n 1 -r
+}
+
+function quit () {
+       echo "bye bye, homie!"
+       break
 }
 

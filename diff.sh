@@ -82,14 +82,5 @@ menuPunkt g "actual branch head   vs. branch head       -> repository vs. reposi
 menuPunkt h "show commits" showCommits
 menuPunkt q "quit" quit
 echo
-read -p "Make your choice: " -n 1 -r choice
-echo
-
-case $choice in
-	"q")
-		break
-	;;
-esac
-(callKeyFunktion $choice)
-read -p $'\n<Press any key to return>' -n 1 -r
+choice
 done
