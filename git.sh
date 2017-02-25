@@ -1,5 +1,6 @@
 #!/bin/sh
 supergithome=~/Personal
+trackchoices=$1
 source $supergithome/flexmenu.sh
 
 function analyzeWorkingDir (){
@@ -27,11 +28,11 @@ function pushActual() {
     importantLog "Checking for updates from origin/$actual"
     if git diff $actual origin/$actual | grep -q ".*"; then
        echo "... found updates in origin/$actual ..."
-       git diff --name-status $actual origin/$actual
+       executeCommand "git diff --name-status $actual origin/$actual"
        read -p "Merge (y/n)? " -n 1 -r
        echo    # (optional) move to a new line
        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          git merge origin/$actual
+          executeCommand "git merge origin/$actual"
        fi
     else
        echo "... nothing to merge ... up to date"
@@ -40,23 +41,23 @@ function pushActual() {
     # check to see if untracked files are in working tree
     if git ls-files --others --exclude-standard | grep -q ".*"; then
       echo "... untracked files found ..."
-      git ls-files --others --exclude-standard
+      executeCommand "git ls-files --others --exclude-standard"
       read -p "Add all (y/n)? " -n 1 -r
       echo    # (optional) move to a new line
       if [[ $REPLY =~ ^[Yy]$ ]]; then
-         git add .
+         executeCommand "git add ."
       fi
     fi
     # check to see if updated tracked files are in working tree
-    if git diff HEAD --name-status | grep -q ".*"; then
+    if git status -s | grep -q ".*"; then
       echo "... found updates in working tree ..."
       diffDrillDownAdvanced "git status -s" " .*" HEAD
       read -p "Commit and push the updates (y/n)? " -n 1 -r
       echo    # (optional) move to a new line
       if [[ $REPLY =~ ^[Yy]$ ]]; then
            read -p "Enter commit message:" cmsg
-           git commit -am "$cmsg" # stage and commit all tracked files
-           git push origin $actual
+           executeCommand "git commit -am '${cmsg}'" # stage and commit all tracked files
+           executeCommand "git push -u origin $actual"
       fi
     else
       echo "... nothing to commit ..."
@@ -264,7 +265,7 @@ git fetch --all 2> /dev/null
 
 while true; do
 clear
-keyfunktionsmap=()
+menuInit
 echo "Working with remotes:"
 menuPunkt a "Gently push actual" pushActual
 menuPunkt c "Merge actual from actual origin" mergeActualFromOrigin
@@ -299,7 +300,7 @@ menuPunkt 4 "Show .gitignore" gitIgnore
 echo
 menuPunkt P "Change project" changeProject
 menuPunkt B "Change branch" changeBranch
-menuPunkt F "Fetch all" adminAliases
+menuPunkt F "Fetch all" fetachAll
 echo
 showStatus
 choice

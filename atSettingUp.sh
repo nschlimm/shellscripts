@@ -75,8 +75,7 @@ function defineMergeTool () {
 
 while true; do
 clear
-keyfunktionsmap=()
-
+menuInit
 echo "Setting up repositories:"
 menuPunkt a "Transform the current directory into a git repository" atLocalGit
 menuPunkt b "Setting up a git repository in a directory" atLocalGitWithDir

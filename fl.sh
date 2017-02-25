@@ -6,6 +6,8 @@ select choice in \
     "To local workspace hausrat-service" \
     "To local workspace import-service" \
     "To local workspace historisierung-lib" \
+    "To local workspace haftpflicht-service" \
+    "To local workspace bfsach-migration" \
     "To local shellscripts" \
     "Quit"
 
@@ -37,11 +39,17 @@ do
 
         ;;
         6)
+            cd /Users/niklasschlimm/workspaces/carriertech/haftpflicht-service
+            ;;
+        7)
+            cd /Users/niklasschlimm/workspaces/carriertech/bfsach-migration
+            ;;
+        8)
             cd /Users/niklasschlimm/Personal
             break
 
         ;;
-        7)
+        9)
             break
         ;;
     esac

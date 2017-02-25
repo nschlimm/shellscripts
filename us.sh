@@ -5,7 +5,8 @@ select choice in \
     "Show all environment variables" \
     "Add an env avriable to profile" \
     "Add path to path variable" \
-    "To local workspace historisierung-lib" \
+    "Search for a resource in jar files" \
+    "Quick search for a resource in jar files" \
     "Quit"
 
 do
@@ -36,11 +37,21 @@ do
 
         ;;
         5)
-            cd /Users/niklasschlimm/workspaces/carriertech/historisierung-lib
+            echo "Enter file name:"
+            read fname
+            cm="jar tf {} | grep $fname &&  echo {}"
+            eval find * -type f -name '*.jar' -print0 |  xargs -0 -I '{}' sh -c "$cm"
             break
 
         ;;
         6)
+            echo "Enter file name:"
+            read fname
+            eval find * -name "*.jar" | xargs grep $fname
+            break
+
+        ;;
+        7)
             break
         ;;
     esac

@@ -68,8 +68,7 @@ git fetch --all
 
 while true; do
 clear
-keyfunktionsmap=()
-
+menuInit
 echo "Note: GIT diff cann compare three locations with each other: the tree (your working directory), the stage, the repository."
 echo "Working with diffs:"
 menuPunkt a "actual HEAD vs. origin/actual branch HEAD  -> repository vs. repository" headHead

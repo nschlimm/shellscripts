@@ -1,10 +1,19 @@
 #!/bin/sh
 # specify keyfunktionsmap=() array and source this script for flex menu capability
 # examplecall: menuPunkt a "Push actual (fetch, merge, commit, push)" pushActual.
+rawdatafilename=rawdata.txt
+summaryfilename=summary.txt
+rawdatahome=~/Personal/
+
+function menuInit () {
+  keyfunktionsmap=()
+  keymenunamemap=()
+}
 
 function menuPunkt () {
 
    keyfunktionsmap+=("$1:$3")
+   keymenunamemap+=("$1:$2")
    echo "$1. $2"
 
 }
@@ -15,11 +24,47 @@ function callKeyFunktion () {
        keys=${i:0:1}
          if [ "$1" == "$keys" ]
            then
-            method=${i:2}
             clear
+            method=${i:2}
             $method
          fi
    done
+   if [[ $trackchoices == 1 ]]; then
+     logCommand "$1" "$method"
+   fi
+}
+
+function logCommand () {
+  method="$2"
+   for i in "${keymenunamemap[@]}"
+     do
+       keys=${i:0:1}
+         if [ "$1" == "$keys" ]
+           then
+            gkommando=${i:2}
+            echo "$gkommando" >> $rawdatahome$rawdatafilename
+            counta=$(grep -c "$gkommando" $rawdatahome$rawdatafilename)
+            sed -i.bak "/$gkommando/d" $rawdatahome$summaryfilename
+            echo "$counta,$gkommando,$method" >> $rawdatahome$summaryfilename
+            sort -k1 -nr $rawdatahome$summaryfilename -o $rawdatahome$summaryfilename
+         fi
+   done
+}
+
+function simpleRead () {
+INPUT=data.cvs
+OLDIFS=$IFS
+IFS=,
+[ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 99; }
+while read flname dob ssn tel status
+do
+  echo "Name : $flname"
+  echo "DOB : $dob"
+  echo "SSN : $ssn"
+  echo "Telephone : $tel"
+  echo "Status : $status"
+done < $INPUT
+IFS=$OLDIFS
 }
 
 function importantLog() {

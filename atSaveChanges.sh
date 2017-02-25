@@ -26,8 +26,7 @@ git fetch --all
 
 while true; do
 clear
-keyfunktionsmap=()
-
+menuInit
 echo "Saving changes"
 menuPunkt a "Git add all gently" addAllGently
 menuPunkt b "Git interactive staging detail session" interStage
