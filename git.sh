@@ -63,7 +63,6 @@ function pushActual() {
       if [[ $REPLY =~ ^[Yy]$ ]]; then
          executeCommand "git push -u origin $actual"
       fi
-      
     else
       echo "... nothing to commit ..."
     fi
