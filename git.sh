@@ -58,13 +58,15 @@ function pushActual() {
            read -p "Enter commit message:" cmsg
            executeCommand "git commit -am '${cmsg}'" # stage and commit all tracked files
       fi
+    else
+      echo "... nothing to commit ..."
+    fi
+    if git diff $actual origin/$actual | grep -q ".*"; then
       read -p "Push (y/n)? " -n 1 -r
       echo
       if [[ $REPLY =~ ^[Yy]$ ]]; then #push
          executeCommand "git push -u origin $actual"
       fi
-    else
-      echo "... nothing to commit ..."
     fi
   fi
 }
