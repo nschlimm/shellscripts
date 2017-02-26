@@ -194,6 +194,7 @@ function showBranchHisto(){
 
 function workingDiffs() {
   . $supergithome/diff.sh
+  nowaitonexit
 }
 
 function setUpstream() {
