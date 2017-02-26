@@ -37,7 +37,7 @@ function pushActual() {
     else
        echo "... nothing to merge ... up to date"
     fi
-    importantLog "Checking for stuff to commit and push in working tree"
+    importantLog "Checking for stuff to commit in working tree"
     # check to see if untracked files are in working tree
     if git ls-files --others --exclude-standard | grep -q ".*"; then
       echo "... untracked files found ..."
@@ -61,12 +61,16 @@ function pushActual() {
     else
       echo "... nothing to commit ..."
     fi
+    importantLog "Checking for stuff to push to origin/$actual"
     if git diff $actual origin/$actual | grep -q ".*"; then
+      echo "... found commited updates in $actual waiting for push to origin/$actual ..."
       read -p "Push (y/n)? " -n 1 -r
       echo
       if [[ $REPLY =~ ^[Yy]$ ]]; then #push
          executeCommand "git push -u origin $actual"
       fi
+    else
+      echo "... nothing to push ..."
     fi
   fi
 }
