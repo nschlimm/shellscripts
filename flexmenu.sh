@@ -11,14 +11,17 @@ function menuInit () {
   touch $rawdatahome$rawdatafilename
   actualmenu="$1"
   menudatamap=()
-  export GREP_COLOR='1;37;41'
+  export GREP_COLOR='1;37;44'
   echo "$1" | grep --color ".*"
   export GREP_COLOR='01;31'
+  echo
 }
 
 function submenuHead () {
    actualsubmenuname="$1"
-   echo "$1"
+  export GREP_COLOR='1;36'
+  echo "$1" | grep --color ".*"
+  export GREP_COLOR='01;31'
 }
 
 function menuPunkt () {

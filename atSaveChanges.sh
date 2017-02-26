@@ -19,7 +19,15 @@ function addAllGently () {
 }
 
 function commitAllChanges () {
-  git commit -a 
+  executeCommand "git commit -a"
+}
+
+function interactiveStage () {
+   executeCommand "git add -i"
+}
+
+function commitStagedSnapshot () {
+	executeCommand "git commit"
 }
 
 git fetch --all
@@ -27,10 +35,16 @@ git fetch --all
 while true; do
 clear
 menuInit "Saving changes"
-submenuHead "Add and Commit:"
+submenuHead "Adding changes to stage:"
 menuPunkt a "Git add all gently" addAllGently
-menuPunkt b "Git interactive staging detail session" interStage
-menuPunkt c "Gently commit a snapshot of all changes in the working directory" commitAllChanges
+menuPunkt b "Git interactive staging session" interactiveStage
+menuPunkt c "Git interactive staging detail session" interStage
+echo
+submenuHead "Commit changes:"
+menuPunkt d "Commit staged snapshot - vim (stage -> archive)" commitStagedSnapshot
+menuPunkt e "Commit staged snapshot - read (stage -> archive)" 
+menuPunkt f "Commit all changes to tracked files - vim (tree -> stage -> archive)"
+menuPunkt g "Commit all changes to tracked files - read (tree -> stage -> archive)"
 echo
 showStatus
 choice

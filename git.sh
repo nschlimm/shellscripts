@@ -52,13 +52,17 @@ function pushActual() {
     if git status -s | grep -q ".*"; then
       echo "... found updates in working tree ..."
       diffDrillDownAdvanced "git status -s" " .*" HEAD
-      read -p "Commit and push the updates (y/n)? " -n 1 -r
+      read -p "Commit the updates (y/n)? " -n 1 -r
       echo    # (optional) move to a new line
       if [[ $REPLY =~ ^[Yy]$ ]]; then
            read -p "Enter commit message:" cmsg
            executeCommand "git commit -am '${cmsg}'" # stage and commit all tracked files
-           executeCommand "git push -u origin $actual"
       fi
+      read -p "Push (y/n)? " -n 1 -r
+      if [[ $REPLY =~ ^[^Yy]$ ]]; then
+         executeCommand "git push -u origin $actual"
+      fi
+      
     else
       echo "... nothing to commit ..."
     fi
