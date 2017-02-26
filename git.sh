@@ -27,7 +27,7 @@ function pushActual() {
     echo "... your HEAD is attached to $actual ..."
     importantLog "Checking for updates from origin/$actual"
     if git diff $actual origin/$actual | grep -q ".*"; then
-       echo "... found updates in origin/$actual ..."
+       echo "... found diff between $actual and origin/$actual ..."
        executeCommand "git diff --name-status $actual origin/$actual"
        read -p "Merge (y/n)? " -n 1 -r
        echo    # (optional) move to a new line
