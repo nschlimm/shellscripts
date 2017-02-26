@@ -30,6 +30,97 @@ function commitStagedSnapshot () {
 	executeCommand "git commit"
 }
 
+function commitChangesVim () {
+	executeCommand "git commit -a"
+}
+
+function stashAll () {
+	executeCommand "git stash"	
+}
+
+function stashPop () {
+	executeCommand "git stash pop"
+}
+
+function stashApply () {
+	executeCommand "git stash apply"
+}
+
+function stashAllIncludeUntracked () {
+	executeCommand "git stash --include-untracked"	
+}
+
+function stashAll () {
+	executeCommand "git stash --include-untracked --all"	
+}
+
+function stashList () {
+	executeCommand "git stash list"	
+}
+
+function stashWithMessage () {
+	echo "Enter save message for stash:"
+	read message
+	executeCommand "git stash save $message"	
+}
+
+function stashPopFromList () {
+	executeCommand "git stash list"
+	echo "Enter stash identifier:"
+	read identifier
+	executeCommand "git stash pop $identifier"
+}
+
+function stashApplyFromList () {
+	executeCommand "git stash list"
+	echo "Enter stash identifier:"
+	read identifier
+	executeCommand "git stash apply $identifier"
+}
+
+function stashSummary () {
+	executeCommand "git stash list"
+	echo "Enter stash identifier: [stash@{0}]"
+	read identifier
+	executeCommand "git stash show $identifier"
+}
+
+function stashDiff () {
+	executeCommand "git stash list"
+	echo "Enter stash identifier: [stash@{0}]"
+	read identifier
+	executeCommand "git stash show $identifier -p --color | diff-so-fancy"
+}
+
+function stashSingle () {
+	executeCommand "gut stash -p"
+}
+
+function stashBranch () {
+	executeCommand "git stash list"
+	echo "Enter stash identifier: [stash@{0}]"
+	read identifier
+	echo "Enter branch name:"
+	read bname
+	executeCommand "git stash branch $bname ${identifier:=stash@{0}}"
+}
+
+function stashDeleteAll () {
+	read -p "Delete all stashes (y/n)? " -n 1 -r
+	echo
+	if [[ $REPLY =~ ^[Yy]$ ]]; then
+	  executeCommand "git stash clear"
+	fi
+	
+}
+
+function stashDeleteSpecific () {
+	executeCommand "git stash list"
+	echo "Enter stash identifier to DELETE: [stash@{0}]"
+	read identifier
+	executeCommand "git stash drop $identifier"
+}
+
 git fetch --all
 
 while true; do
@@ -42,9 +133,31 @@ menuPunkt c "Git interactive staging detail session" interStage
 echo
 submenuHead "Commit changes:"
 menuPunkt d "Commit staged snapshot - vim (stage -> archive)" commitStagedSnapshot
-menuPunkt e "Commit staged snapshot - read (stage -> archive)" 
-menuPunkt f "Commit all changes to tracked files - vim (tree -> stage -> archive)"
-menuPunkt g "Commit all changes to tracked files - read (tree -> stage -> archive)"
+menuPunkt f "Commit all changes of tracked files - vim (tree -> stage -> archive)" commitChangesVim
+menuPunkt g "Commit all changes of tracked files - read (tree -> stage -> archive)" commitChanges
+echo
+submenuHead "Stash current changes:"
+menuPunkt h "Stash current changes" stash
+menuPunkt i "Reapply stash to current directory (pop - deletes stash)" stashPop
+menuPunkt j "Reapply stash to current directory (apply - leaves stash alive)" stashApply
+menuPunkt k "Stash current changes - include untracked" stashAllIncludeUntracked
+menuPunkt l "Stash current changes - include all untracked and ignored" stashAll
+echo
+submenuHead "Managing multiple stashes:"
+menuPunkt m "List stashes" stashList
+menuPunkt n "Stash with message" stashWithMessage
+menuPunkt o "Reapply stash to current directory from stash list (pop)" stashPopFromList
+menuPunkt p "Reapply stash to current directory from stash list (apply)" stashApplyFromList
+echo
+submenuHead "Clean up stashes:"
+menuPunkt r "Delete all stashes" stashDeleteAll
+menuPunkt S "Delete specific stash" stashDeleteSpecific
+echo
+submenuHead "Other stash stuff:"
+menuPunkt r "View summary of a stash" stashSummary
+menuPunkt s "View diff of a stash" stashDiff
+menuPunkt t "Stash single files" stashSingle
+menuPunkt u "Create branch from stash" stashBranch
 echo
 showStatus
 choice

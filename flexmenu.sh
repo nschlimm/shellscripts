@@ -6,6 +6,7 @@ summaryfilename=summary.txt
 menuitemsfilename=menugroups.txt
 rawdatahome=~/Personal/
 actualmenu=
+waitonexit
 
 function menuInit () {
   touch $rawdatahome$rawdatafilename
@@ -43,8 +44,22 @@ function callKeyFunktion () {
               logCommand "$1"
             fi
             $method
+            echo
+            if $waitstatus; then
+               read -p $'\n<Press any key to return>' -n 1 -r
+             else
+              waitonexit # back to default after method execution
+            fi
          fi
    done
+}
+
+function nowaitonexit () {
+  waitstatus=false
+}
+
+function waitonexit () {
+  waitstatus=true
 }
 
 function logCommand () {
@@ -230,8 +245,6 @@ function choice () {
   
   callKeyFunktion $REPLY
 
-  echo
-  read -p $'\n<Press any key to return>' -n 1 -r
 }
 
 function quit () {

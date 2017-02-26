@@ -51,6 +51,22 @@ function pushActual() {
     else
       echo "... no untracked files present ..."
     fi
+    commitChanges
+    importantLog "Checking for stuff to push to origin/$actual"
+    if git diff $actual origin/$actual | grep -q ".*"; then
+      echo "... found commited updates in $actual waiting for push to origin/$actual ..."
+      read -p "Push (y/n)? " -n 1 -r
+      echo
+      if [[ $REPLY =~ ^[Yy]$ ]]; then #push
+         executeCommand "git push -u origin $actual"
+      fi
+    else
+      echo "... nothing to push ..."
+    fi
+  fi
+}
+
+function commitChanges () {
     importantLog "Checking for stuff to commit from the working tree"
     if git status -s | grep -q ".*"; then
       echo "... found updates on tracked files in working tree ..."
@@ -64,18 +80,6 @@ function pushActual() {
     else
       echo "... nothing to commit ..."
     fi
-    importantLog "Checking for stuff to push to origin/$actual"
-    if git diff $actual origin/$actual | grep -q ".*"; then
-      echo "... found commited updates in $actual waiting for push to origin/$actual ..."
-      read -p "Push (y/n)? " -n 1 -r
-      echo
-      if [[ $REPLY =~ ^[Yy]$ ]]; then #push
-         executeCommand "git push -u origin $actual"
-      fi
-    else
-      echo "... nothing to push ..."
-    fi
-  fi
 }
 
 function mergeActualFromOrigin() {
@@ -257,10 +261,12 @@ function interactiveStage () {
 
 function atlassiansView() {
   . $supergithome/atlassian.sh
+  nowaitonexit
 }
 
 function changeProject () {
   . ~/Personal/fl.sh
+  nowaitonexit
 }
 
 function changeBranch () {

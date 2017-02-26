@@ -4,10 +4,12 @@ source flexmenu.sh
 
 function settingUp () {
 	source $supergithome/atSettingUp.sh
+    nowaitonexit
 }
 
 function savingChanges () {
 	source $supergithome/atSaveChanges.sh
+    nowaitonexit
 }
 
 git fetch --all
