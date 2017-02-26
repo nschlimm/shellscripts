@@ -181,7 +181,7 @@ function selectItem () {
   listkommando="$1"
   regexp="$2"
   eval $listkommando | nl -n 'ln' -s " "
-  echo "Select line or 'q' to exit drilldown:"
+  echo "Select line or nothing to exit drilldown:"
   read linenumber
   if [ "$linenumber" = "q" ]; then
     break
@@ -192,7 +192,7 @@ function selectItem () {
      selected=$($listkommando | sed -n ${linenumber}p)
   fi
   fname=$(echo $selected | grep -oh "$regexp" | sed "s/ //g")
-  echo "... selected $fname"
+  echo "... selected ${fname:-nothing}"
 }
 
 function diffDrillDownAdvanced () { # list kommando; regexp to select filename from list command; baseline object name; other object name
@@ -207,6 +207,9 @@ function diffDrillDownAdvanced () { # list kommando; regexp to select filename f
 
         selectItem "$listkommando" "$regexp"
 
+        if [[ $fname = "" ]]; then
+          break
+        fi
         if [ $# -eq 3 ]
           then
              kommando="git diff --color $3 $fname | diff-so-fancy"
