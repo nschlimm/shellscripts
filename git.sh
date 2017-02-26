@@ -20,6 +20,7 @@ function analyzeWorkingDir (){
 }
 
 function pushActual() {
+  executeCommand "git fetch --all"
   importantLog "Checking your head state"
   if git status | grep -q "HEAD detached"; then
      echo "... you seem to be on a detached head state ... can't push ..."
