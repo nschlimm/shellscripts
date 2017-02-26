@@ -10,9 +10,6 @@ actualmenu=
 function menuInit () {
   touch $rawdatahome$rawdatafilename
   actualmenu="$1"
-  keyfunktionsmap=()
-  keymenuitemmap=()
-  keysubmenumap=()
   menudatamap=()
   export GREP_COLOR='1;37;41'
   echo "$1" | grep --color ".*"
@@ -26,24 +23,21 @@ function submenuHead () {
 
 function menuPunkt () {
 
-   keyfunktionsmap+=("$1:$3")
-   keymenuitemmap+=("$1:$2")
-   keysubmenumap+=("$1:$actualsubmenuname")
-   menudatamap+=("$1#$2#$actualsubmenuname#$actualmenu")
+   menudatamap+=("$1#$2#$3#$actualsubmenuname#$actualmenu")
    echo "$1. $2"
 
 }
 
 function callKeyFunktion () { 
-   for i in "${keyfunktionsmap[@]}"
+   for i in "${menudatamap[@]}"
      do
        keys=${i:0:1}
          if [ "$1" == "$keys" ]
            then
             clear
-            method=${i:2}
+            method=$(echo "$i" | cut -f3 -d#)
             if [[ $trackchoices == 1 ]]; then
-              logCommand "$1" "$method"
+              logCommand "$1"
             fi
             $method
          fi
@@ -51,27 +45,15 @@ function callKeyFunktion () {
 }
 
 function logCommand () {
-  method="$2"
-   for i in "${keymenuitemmap[@]}"
+   for i in "${menudatamap[@]}"
      do
        keys=${i:0:1}
          if [ "$1" == "$keys" ]
            then
-            gkommando=${i:2}
-            findSubmenuname "$1"
+            gkommando=$(echo "$i" | cut -f2 -d#)
+            submenuname=$(echo "$i" | cut -f4 -d#)
+            method=$(echo "$i" | cut -f3 -d#)
             echo "$actualmenu,$submenuname,$gkommando,$method" >> $rawdatahome$rawdatafilename
-         fi
-   done
-}
-
-function findSubmenuname () {
-  keypressed="$1"
-   for i in "${keysubmenumap[@]}"
-     do
-       keys=${i:0:1}
-         if [ "$keys" == "$keypressed" ]
-           then
-            submenuname=${i:2}
          fi
    done
 }
@@ -95,6 +77,11 @@ function compileMenu () {
       sort -k1 -nr $rawdatahome$menuitemsfilename -o $rawdatahome$menuitemsfilename
    done < $INPUT
    IFS=$OLDIFS
+   importantLog "Your sorted summary of command favorites"
+   cat $rawdatahome$summaryfilename
+   echo
+   importantLog "Your sorted summary of menu favorites"
+   cat $rawdatahome$menuitemsfilename 
 }
 
 function purgeCash () {
