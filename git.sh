@@ -60,7 +60,7 @@ function pushActual() {
       fi
       read -p "Push (y/n)? " -n 1 -r
       echo
-      if [[ $REPLY =~ ^[Yy]$ ]]; then
+      if [[ $REPLY =~ ^[Yy]$ ]]; then #push
          executeCommand "git push -u origin $actual"
       fi
     else
