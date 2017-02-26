@@ -58,7 +58,7 @@ function pushActual() {
       echo    # (optional) move to a new line
       if [[ $REPLY =~ ^[Yy]$ ]]; then
            read -p "Enter commit message:" cmsg
-           executeCommand "git commit -am '${cmsg}'" # stage and commit all tracked files
+           executeCommand "git commit -am '${cmsg}'" # stage and commit all tracked filess
       fi
     else
       echo "... nothing to commit ..."
