@@ -70,6 +70,7 @@ while true; do
 clear
 menuInit "Working with diffs"
 echo "Note: GIT diff cann compare three locations with each other: the tree (your working directory), the stage, the repository."
+submenuHead "Different diff options:"
 menuPunkt a "actual HEAD vs. origin/actual branch HEAD  -> repository vs. repository" headHead
 menuPunkt b "actual working dir   vs. HEAD              -> tree vs. repository" dirHead
 menuPunkt c "actual working dir   vs. other commits     -> tree vs. repository" treeCommit

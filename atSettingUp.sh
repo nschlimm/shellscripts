@@ -75,13 +75,14 @@ function defineMergeTool () {
 
 while true; do
 clear
-menuInit "Setting up repositories"
+menuInit "Repositories"
+submenuHead "Setting up repositories"
 menuPunkt a "Transform the current directory into a git repository" atLocalGit
 menuPunkt b "Setting up a git repository in a directory" atLocalGitWithDir
 menuPunkt c "Setting up a shared git repository in a directory" atLocalGitBare
 menuPunkt d "Clone a remote repository" cloneRemote
 echo
-echo "Configure repositories:"
+submenuHead "Configure repositories:"
 menuPunkt e "Define the author name and email to be used for all commits" defineAuthor
 menuPunkt f "Administering aliases" adminAliases
 menuPunkt g "Define the text editor used by commands" textEditor

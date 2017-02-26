@@ -13,7 +13,10 @@ function menuInit () {
   keyfunktionsmap=()
   keymenuitemmap=()
   keysubmenumap=()
-  echo "$1"
+  menudatamap=()
+  export GREP_COLOR='1;37;41'
+  echo "$1" | grep --color ".*"
+  export GREP_COLOR='01;31'
 }
 
 function submenuHead () {
@@ -26,6 +29,7 @@ function menuPunkt () {
    keyfunktionsmap+=("$1:$3")
    keymenuitemmap+=("$1:$2")
    keysubmenumap+=("$1:$actualsubmenuname")
+   menudatamap+=("$1#$2#$actualsubmenuname#$actualmenu")
    echo "$1. $2"
 
 }
