@@ -265,8 +265,8 @@ git fetch --all 2> /dev/null
 
 while true; do
 clear
-menuInit
-echo "Working with remotes:"
+menuInit "Super GIT Home"
+submenuHead "Working with remotes:"
 menuPunkt a "Gently push actual" pushActual
 menuPunkt c "Merge actual from actual origin" mergeActualFromOrigin
 menuPunkt d "Clone remote repository" cloneRemote
@@ -274,33 +274,36 @@ menuPunkt e "Set upstream to actual" setUpstream
 menuPunkt f "Administer remotes" adminRemotes
 menuPunkt g "Show repository history" showRepoHisto
 echo
-echo "Working on local branches:"
+submenuHead "Working on local branches:"
 menuPunkt k "New local branch, checkout" newLocalBranch
 menuPunkt n "Delete local branch" deleteBranch
 menuPunkt o "Merge from source branch to target branch" mergeSourceToTarget
 menuPunkt p "Show all branches (incl. remote)" showAllBranches
 menuPunkt r "Show branch history" showBranchHisto
 echo
-echo "Navigating commit pointers:"
+submenuHead "Navigating commit pointers:"
 menuPunkt l "Rollback head to last commit" rollBackLast
 menuPunkt m "Undo reset commands" undoReset
 echo
-echo "Other usefull actions:"
+submenuHead "Other usefull actions:"
 menuPunkt s "Working with diffs" workingDiffs
 menuPunkt t "Interactively staging/unstaging files" interactiveStage
 menuPunkt u "Stash: save local changes and bring head to working dir" stash
 menuPunkt v "Stash pop: revert last stash" pop
 menuPunkt w "Atlassian's view" atlassiansView
 echo
-echo "Git admin actions:"
+submenuHead "Git admin actions:"
 menuPunkt 1 "Show local git config" localGitConfig
 menuPunkt 2 "Show global git config" globalGitConfig
 menuPunkt 3 "Administering aliases" adminAliases
 menuPunkt 4 "Show .gitignore" gitIgnore
 echo
+submenuHead "Shortcuts"
 menuPunkt P "Change project" changeProject
 menuPunkt B "Change branch" changeBranch
 menuPunkt F "Fetch all" fetachAll
+menuPunkt C "Compile favorites" compileMenu
+menuPunkt X "Purge cache" purgeCash
 echo
 showStatus
 choice

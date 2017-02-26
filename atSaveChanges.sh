@@ -26,8 +26,7 @@ git fetch --all
 
 while true; do
 clear
-menuInit
-echo "Saving changes"
+menuInit "Saving changes"
 menuPunkt a "Git add all gently" addAllGently
 menuPunkt b "Git interactive staging detail session" interStage
 menuPunkt c "Gently commit a snapshot of all changes in the working directory" commitAllChanges

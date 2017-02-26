@@ -3,17 +3,29 @@
 # examplecall: menuPunkt a "Push actual (fetch, merge, commit, push)" pushActual.
 rawdatafilename=rawdata.txt
 summaryfilename=summary.txt
+menuitemsfilename=menugroups.txt
 rawdatahome=~/Personal/
+actualmenu=
 
 function menuInit () {
+  touch $rawdatahome$rawdatafilename
+  actualmenu="$1"
   keyfunktionsmap=()
-  keymenunamemap=()
+  keymenuitemmap=()
+  keysubmenumap=()
+  echo "$1"
+}
+
+function submenuHead () {
+   actualsubmenuname="$1"
+   echo "$1"
 }
 
 function menuPunkt () {
 
    keyfunktionsmap+=("$1:$3")
-   keymenunamemap+=("$1:$2")
+   keymenuitemmap+=("$1:$2")
+   keysubmenumap+=("$1:$actualsubmenuname")
    echo "$1. $2"
 
 }
@@ -26,45 +38,65 @@ function callKeyFunktion () {
            then
             clear
             method=${i:2}
+            if [[ $trackchoices == 1 ]]; then
+              logCommand "$1" "$method"
+            fi
             $method
          fi
    done
-   if [[ $trackchoices == 1 ]]; then
-     logCommand "$1" "$method"
-   fi
 }
 
 function logCommand () {
   method="$2"
-   for i in "${keymenunamemap[@]}"
+   for i in "${keymenuitemmap[@]}"
      do
        keys=${i:0:1}
          if [ "$1" == "$keys" ]
            then
             gkommando=${i:2}
-            echo "$gkommando" >> $rawdatahome$rawdatafilename
-            counta=$(grep -c "$gkommando" $rawdatahome$rawdatafilename)
-            sed -i.bak "/$gkommando/d" $rawdatahome$summaryfilename
-            echo "$counta,$gkommando,$method" >> $rawdatahome$summaryfilename
-            sort -k1 -nr $rawdatahome$summaryfilename -o $rawdatahome$summaryfilename
+            findSubmenuname "$1"
+            echo "$actualmenu,$submenuname,$gkommando,$method" >> $rawdatahome$rawdatafilename
          fi
    done
 }
 
-function simpleRead () {
-INPUT=data.cvs
-OLDIFS=$IFS
-IFS=,
-[ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 99; }
-while read flname dob ssn tel status
-do
-  echo "Name : $flname"
-  echo "DOB : $dob"
-  echo "SSN : $ssn"
-  echo "Telephone : $tel"
-  echo "Status : $status"
-done < $INPUT
-IFS=$OLDIFS
+function findSubmenuname () {
+  keypressed="$1"
+   for i in "${keysubmenumap[@]}"
+     do
+       keys=${i:0:1}
+         if [ "$keys" == "$keypressed" ]
+           then
+            submenuname=${i:2}
+         fi
+   done
+}
+
+function compileMenu () {
+   touch $rawdatahome$summaryfilename
+   touch $rawdatahome$menuitemsfilename
+   INPUT=$rawdatahome$rawdatafilename
+   OLDIFS=$IFS
+   IFS=,
+   [ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 99; }
+   while read menu submenu kommando methode
+   do
+      counta=$(grep -c "$kommando" $rawdatahome$rawdatafilename)
+      sed -i.bak "/$kommando/d" $rawdatahome$summaryfilename
+      echo "$counta,$menu,$submenu,$kommando,$methode" >> $rawdatahome$summaryfilename
+      sort -k1 -nr $rawdatahome$summaryfilename -o $rawdatahome$summaryfilename
+      counta=$(grep -c "$submenu" $rawdatahome$rawdatafilename)
+      sed -i.bak "/$submenu/d" $rawdatahome$menuitemsfilename
+      echo "$counta,$menu,$submenu" >> $rawdatahome$menuitemsfilename      
+      sort -k1 -nr $rawdatahome$menuitemsfilename -o $rawdatahome$menuitemsfilename
+   done < $INPUT
+   IFS=$OLDIFS
+}
+
+function purgeCash () {
+  rm $rawdatahome$summaryfilename
+  rm $rawdatahome$menuitemsfilename
+  rm $rawdatahome$rawdatafilename
 }
 
 function importantLog() {

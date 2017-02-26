@@ -14,9 +14,7 @@ git fetch --all
 
 while true; do
 clear
-keyfunktionsmap=()
-
-echo "Atlassian's View"
+menuInit "Atlassian's View"
 echo "Atlassians view on GIT, https://de.atlassian.com/git/tutorials"
 echo 
 echo "Working on your local repository"
