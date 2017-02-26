@@ -86,10 +86,12 @@ function compileMenu () {
    while read menu submenu kommando methode
    do
       counta=$(grep -c "$kommando" $rawdatahome$rawdatafilename)
+      kommando=$(echo $kommando | sed 's#/#-#g')
       sed -i.bak "/$kommando/d" $rawdatahome$summaryfilename
       echo "$counta,$menu,$submenu,$kommando,$methode" >> $rawdatahome$summaryfilename
       sort -k1 -nr $rawdatahome$summaryfilename -o $rawdatahome$summaryfilename
       counta=$(grep -c "$submenu" $rawdatahome$rawdatafilename)
+      kommando=$(echo $submenu | sed 's#/#-#g')
       sed -i.bak "/$submenu/d" $rawdatahome$menuitemsfilename
       echo "$counta,$menu,$submenu" >> $rawdatahome$menuitemsfilename      
       sort -k1 -nr $rawdatahome$menuitemsfilename -o $rawdatahome$menuitemsfilename
