@@ -151,13 +151,13 @@ menuPunkt p "Reapply stash to current directory from stash list (apply)" stashAp
 echo
 submenuHead "Clean up stashes:"
 menuPunkt r "Delete all stashes" stashDeleteAll
-menuPunkt S "Delete specific stash" stashDeleteSpecific
+menuPunkt s "Delete specific stash" stashDeleteSpecific
 echo
 submenuHead "Other stash stuff:"
-menuPunkt r "View summary of a stash" stashSummary
-menuPunkt s "View diff of a stash" stashDiff
-menuPunkt t "Stash single files" stashSingle
-menuPunkt u "Create branch from stash" stashBranch
+menuPunkt t "View summary of a stash" stashSummary
+menuPunkt u "View diff of a stash" stashDiff
+menuPunkt v "Stash single files" stashSingle
+menuPunkt w "Create branch from stash" stashBranch
 echo
 showStatus
 choice
