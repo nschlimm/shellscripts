@@ -37,7 +37,7 @@ function pushActual() {
     else
        echo "... nothing to merge ... up to date"
     fi
-    importantLog "Checking for stuff to commit in working tree"
+    importantLog "Checking for untracked files in the working tree"
     # check to see if untracked files are in working tree
     if git ls-files --others --exclude-standard | grep -q ".*"; then
       echo "... untracked files found ..."
@@ -47,10 +47,12 @@ function pushActual() {
       if [[ $REPLY =~ ^[Yy]$ ]]; then
          executeCommand "git add ."
       fi
+    else
+      echo "... no untracked files present ..."
     fi
-    # check to see if updated tracked files are in working tree
+    importantLog "Checking for stuff to commit from the working tree"
     if git status -s | grep -q ".*"; then
-      echo "... found updates in working tree ..."
+      echo "... found updates on tracked files in working tree ..."
       diffDrillDownAdvanced "git status -s" " .*" HEAD
       read -p "Commit the updates (y/n)? " -n 1 -r
       echo    # (optional) move to a new line
