@@ -59,6 +59,7 @@ function pushActual() {
            executeCommand "git commit -am '${cmsg}'" # stage and commit all tracked files
       fi
       read -p "Push (y/n)? " -n 1 -r
+      echo
       if [[ $REPLY =~ ^[Yy]$ ]]; then
          executeCommand "git push -u origin $actual"
       fi
