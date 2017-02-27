@@ -121,6 +121,13 @@ function stashDeleteSpecific () {
 	executeCommand "git stash drop $identifier"
 }
 
+function inspectStash () {
+	executeCommand "git stash list"
+	echo "Enter stash identifier to inspect:"
+	read identifier
+	executeCommand "git log --oneline --graph ${identifier:-stash@{0}} -n 15"
+}
+
 git fetch --all
 
 while true; do
@@ -158,6 +165,7 @@ menuPunkt t "View summary of a stash (stash state vs. original parent commit)" s
 menuPunkt u "View diff of a stash (stash state vs. original parent commit)" stashDiff
 menuPunkt v "Stash single files" stashSingle
 menuPunkt w "Create branch from stash" stashBranch
+menuPunkt x "Inspect stashes" inspectStash
 echo
 showStatus
 choice
