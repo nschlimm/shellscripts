@@ -71,7 +71,8 @@ function logCommand () {
             gkommando=$(echo "$i" | cut -f2 -d#)
             submenuname=$(echo "$i" | cut -f4 -d#)
             method=$(echo "$i" | cut -f3 -d#)
-            echo "$actualmenu,$submenuname,$gkommando,$method" >> $rawdatahome$rawdatafilename
+            today=$(date)
+            echo "$today,$actualmenu,$submenuname,$gkommando,$method" >> $rawdatahome$rawdatafilename
          fi
    done
 }
@@ -83,7 +84,7 @@ function compileMenu () {
    OLDIFS=$IFS
    IFS=,
    [ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 99; }
-   while read menu submenu kommando methode
+   while read logdate menu submenu kommando methode
    do
       counta=$(grep -c "$kommando" $rawdatahome$rawdatafilename)
       kommando=$(echo $kommando | sed 's#/#-#g')
@@ -180,8 +181,8 @@ function drillDown () {
 }
 
 function selectItem () {
-  listkommando="$1"
-  regexp="$2"
+  listkommando="$1" # list to select from
+  regexp="$2" # optional: regexp to grep considered item from selected line item, e.g. 'M foo.bar -> grep foo.bar with "[^ ]*$"
   eval $listkommando | nl -n 'ln' -s " "
   echo "Select line or nothing to exit drilldown:"
   read linenumber
@@ -190,10 +191,12 @@ function selectItem () {
   fi
   if [ -z "$linenumber" ]; then
      selected=""
+     echo "this"
    else
-     selected=$($listkommando | sed -n ${linenumber}p)
+     selected=$(eval "$listkommando" | sed -n ${linenumber}p)
+     echo $selected
   fi
-  fname=$(echo $selected | grep -oh "$regexp" | sed "s/ //g")
+  fname=$(echo $selected | grep -oh "${regexp:-.*}" | sed "s/ //g")
   echo "... selected ${fname:-nothing}"
 }
 

@@ -128,8 +128,6 @@ function inspectStash () {
 	executeCommand "git log --oneline --graph ${identifier:-stash@{0}} -n 15"
 }
 
-git fetch --all
-
 while true; do
 clear
 menuInit "Saving changes"

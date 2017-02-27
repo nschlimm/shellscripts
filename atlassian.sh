@@ -1,6 +1,7 @@
 #!/bin/sh
 supergithome=~/Personal
 source flexmenu.sh
+trackchoices=$1
 
 function settingUp () {
 	source $supergithome/atSettingUp.sh
@@ -11,8 +12,6 @@ function savingChanges () {
 	source $supergithome/atSaveChanges.sh
     nowaitonexit
 }
-
-git fetch --all
 
 while true; do
 clear
