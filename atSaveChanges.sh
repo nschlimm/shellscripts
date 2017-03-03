@@ -128,6 +128,11 @@ function inspectStash () {
 	executeCommand "git log --oneline --graph ${identifier:-stash@{0}} -n 15"
 }
 
+function ignoreMenu () {
+	. $supergithome/atIgnore.sh
+	nowaitonexit
+}
+
 while true; do
 clear
 menuInit "Saving changes"
@@ -164,6 +169,9 @@ menuPunkt u "View diff of a stash (stash state vs. original parent commit)" stas
 menuPunkt v "Stash single files" stashSingle
 menuPunkt w "Create branch from stash" stashBranch
 menuPunkt x "Inspect stashes" inspectStash
+echo
+submenuHead "Ignoring files:"
+menuPunkt y "Ignore menu" ignoreMenu
 echo
 showStatus
 choice

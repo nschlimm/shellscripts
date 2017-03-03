@@ -281,6 +281,23 @@ function fetachAll () {
        git fetch --all
 }
 
+function fetchAllStuff () {
+  changeProject
+  waitonexit
+  ls | while read line; do
+    cd $line
+    importantLog "In $line ..."
+    if [ -d .git ]; then
+       echo "... $line is a GIT repository ... fetching ..."
+       executeCommand "git fetch --all"
+     else
+      echo "... $line is not a GIT repository"
+    fi
+    cd ..
+  done
+}
+
+
 git fetch --all 2> /dev/null
 
 while true; do
@@ -293,6 +310,7 @@ menuPunkt d "Clone remote repository" cloneRemote
 menuPunkt e "Set upstream to actual" setUpstream
 menuPunkt f "Administer remotes" adminRemotes
 menuPunkt g "Show repository history" showRepoHisto
+menuPunkt h "Fetch all stuff" fetchAllStuff
 echo
 submenuHead "Working on local branches:"
 menuPunkt k "New local branch, checkout" newLocalBranch
