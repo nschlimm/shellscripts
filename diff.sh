@@ -1,6 +1,6 @@
 #!/bin/sh
 supergithome=~/Personal
-source flexmenu.sh
+source $supergithome/flexmenu.sh
 
 function numberedList () {
   kommando="$1"
@@ -61,7 +61,20 @@ function actualHeadbranchHead () {
 function showCommits () {
     echo "How many commits?"
     read hmany
-    git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -n $hmany
+    git log --graph --pretty=format:'%Cred%h%Creset %ad: %C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -n ${hmany:-100} --date=short
+}
+
+function diffDate () {
+   echo "Enter date since in [yyyy-mm-dd]:"
+   read sincedate
+   lastcommitdate=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" --since "$sincedate 00:00:00" | cut -f3 -d' ' | tail -1) # the last commit date since the date given
+   echo "last date: $lastcommitdate"
+   commitpriortolast=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" | grep "$lastcommitdate" -A 1 | tail -1 | cut -f2 -d' ') # commit before the last commit in period
+   commitdatepriortolast=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" | grep "$lastcommitdate" -A 1 | tail -1 | cut -f3 -d' ') # commit date before the last commit in period
+   echo "commit prior to last date: $commitpriortolast ... on: $commitdatepriortolast"
+   newestcommit=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" | head -1 | cut -f2 -d' ')
+   echo "latest commit: $newestcommit"
+   diffDrillDownAdvanced "git diff --name-status $commitpriortolast $newestcommit" "[ ].*$" "$commitpriortolast" "$newestcommit"
 }
 
 git fetch --all
@@ -78,6 +91,11 @@ menuPunkt d "actual working dir   vs. stage             -> tree vs. index" treeS
 menuPunkt e "commit               vs. commit            -> repository vs. repository" commitCommit
 menuPunkt f "branch head          vs. branch head       -> repository vs. repository" branchBranch
 menuPunkt g "actual branch head   vs. branch head       -> repository vs. repositoty" actualHeadbranchHead
+echo
+submenuHead "Specific diffs:"
+menuPunkt k "Diff since date" diffDate
+echo
+submenuHead "Other usefull stuff here:"
 menuPunkt h "show commits" showCommits
 menuPunkt q "quit" quit
 echo
