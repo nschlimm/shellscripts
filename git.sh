@@ -297,6 +297,10 @@ function fetchAllStuff () {
   done
 }
 
+function gitExtras () {
+  source $supergithome/gitExtras.sh
+  nowaitonexit
+}
 
 git fetch --all 2> /dev/null
 
@@ -335,6 +339,7 @@ menuPunkt 1 "Show local git config" localGitConfig
 menuPunkt 2 "Show global git config" globalGitConfig
 menuPunkt 3 "Administering aliases" adminAliases
 menuPunkt 4 "Show .gitignore" gitIgnore
+menuPunkt 5 "Git extras" gitExtras
 echo
 submenuHead "Shortcuts"
 menuPunkt P "Change project" changeProject

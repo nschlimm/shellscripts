@@ -184,7 +184,7 @@ function selectItem () {
   listkommando="$1" # list to select from
   regexp="$2" # optional: regexp to grep considered item from selected line item, e.g. 'M foo.bar -> grep foo.bar with "[^ ]*$"
   eval $listkommando | nl -n 'ln' -s " "
-  echo "Select line or nothing to exit drilldown:"
+  echo "Select line or nothing to exit:"
   read linenumber
   if [ "$linenumber" = "q" ]; then
     break

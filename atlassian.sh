@@ -13,6 +13,12 @@ function savingChanges () {
     nowaitonexit
 }
 
+function inspectingRepos () {
+	source $supergithome/inspRepo.sh
+	nowaitonexit
+}
+
+
 while true; do
 clear
 menuInit "Atlassian's View"
@@ -21,7 +27,7 @@ echo
 submenuHead "Working on your local repository"
 menuPunkt a "Setting up a repository" settingUp
 menuPunkt b "Saving changes" savingChanges
-menuPunkt c "Inspecting a repository" 
+menuPunkt c "Inspecting a repository" inspectingRepos
 menuPunkt d "Undoing changes" 
 menuPunkt e "Rewriting history" 
 echo
