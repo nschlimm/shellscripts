@@ -35,7 +35,7 @@ function pushActual() {
 
 function pushChanges () {
     importantLog "Checking for stuff to push to origin/$actual"
-    if git push --dry-run | grep -q ".*"; then
+    if git log origin/$actual..$actual --oneline | grep -q ".*"; then
       echo "... found commited updates in $actual waiting for push to origin/$actual ..."
       read -p "Push (y/n)? " -n 1 -r
       echo
