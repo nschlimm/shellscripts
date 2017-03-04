@@ -3,7 +3,6 @@ supergithome=~/workspaces/personal/shellscripts
 source $supergithome/flexmenu.sh
 
 function toDir () {
-	currentdir="$1"
 	eval cd "$1"
 	nowaitonexit
 }
@@ -34,6 +33,7 @@ if [ -n ${workspaces+x} ]; then
     done
 fi
 echo
+priorlocation=$(pwd) # remember actual location
 submenuHead "GIT repos inside workspaces:"
 for j in "${workspaces[@]}"
 do
@@ -46,9 +46,8 @@ do
         ((keycounter++))
     done <<< "$(echo -e "$lines")"
 done
+eval cd "$priorlocation" # return to previous location
 echo
-
-eval cd $currentdir # set the directory in the current shell
 
 coloredLog $(pwd) "1;44"
 
