@@ -1,0 +1,7 @@
+[workspaces]
+carriertech=~/workspaces/carriertech
+personal=~/workspaces/personal
+community=~/workspaces/community
+
+[locations]
+mavenrepohome=~/.m2

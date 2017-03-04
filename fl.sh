@@ -1,45 +1,59 @@
 #!/bin/sh
-#!/bin/sh
-supergithome=~/Personal
+supergithome=~/workspaces/personal/shellscripts
 source $supergithome/flexmenu.sh
 
-function expandWorkspace () {
-	cd ~/workspaces/carriertech
-    selectItem "ls -l | grep -v 'total' | grep -o '[^ ]*$'"
-    cd $selected
-    nowaitonexit
-}
-
-function toDirWorkspace () {
-	project="$1"
-	eval cd ~/workspaces/carriertech/$project
-	nowaitonexit
-}
-
 function toDir () {
-	eval cd "$1"
+	currentdir="$1"
 	nowaitonexit
 }
 
+while true; do
 clear
+thekeys="abcdefghijklmnoprstuvwxyz"
+declare -x keycounter=0
 menuInit "Favorite locations"
-submenuHead "Workspace locations:"
-menuPunkt a "To local workspace carriertech" "toDir ~/workspaces/carriertech"
-menuPunkt b "Something in workspace" expandWorkspace
-menuPunkt c "To workspaces" "toDir ~/workspaces"
-echo 
-submenuHead "Git repositories:"
-menuPunkt e "To local workspace antragsenden-service" "toDirWorkspace antragsenden-service/"
-menuPunkt f "To local workspace bfsach-migration" "toDirWorkspace bfsach-migration/"
-menuPunkt g "To local workspace haftpflicht-service" "toDirWorkspace haftpflicht-service/"
-menuPunkt h "To local workspace hausrat-service" "toDirWorkspace hausrat-service/"
-menuPunkt i "To local workspace historisierung-lib" "toDirWorkspace historisierung-lib/"
-menuPunkt j "To local workspace vertragsuebersicht-app" "toDirWorkspace vertraguebersicht-app/"
-menuPunkt k "To local workspace infrastructure" "toDirWorkspace infrastructure/"
-menuPunkt l "To local workspace bfsach-mapping-lib" "toDirWorkspace bfsach-mapping-lib/"
-echo 
-submenuHead "Other favorite locations"
-menuPunkt o "To local maven repo root" "toDir ~/.m2/"
-menuPunkt p "To local shellscripts" "toDir ~/Personal/"
+submenuHead "Locations:"
+if [ -n ${locations+x} ]; then
+	for j in "${locations[@]}"
+	do
+		locationname=$(echo "$j" | cut -f1 -d'=')
+		locationdir=$(echo "$j" | cut -f2 -d'=')
+		menuPunkt "${thekeys:${keycounter}:1}" "$locationname" "toDir $locationdir"
+       ((keycounter++))
+    done
+fi
 echo
+submenuHead "Workspaces:"
+if [ -n ${workspaces+x} ]; then
+	for j in "${workspaces[@]}"
+	do
+		locationname=$(echo "$j" | cut -f1 -d'=')
+		locationdir=$(echo "$j" | cut -f2 -d'=')
+		menuPunkt "${thekeys:${keycounter}:1}" "$locationname" "toDir $locationdir"
+        ((keycounter++))
+    done
+fi
+echo
+submenuHead "GIT repos inside workspaces:"
+for j in "${workspaces[@]}"
+do
+	locationdir=$(echo "$j" | cut -f2 -d'=')
+	eval cd $locationdir
+	lines=$(eval find $locationdir -name ".git")
+    while read line; do
+    	completelocation=${line::${#line}-5}
+    	menuPunkt "${thekeys:${keycounter}:1}" "$completelocation" "toDir $completelocation"
+        ((keycounter++))
+    done <<< "$(echo -e "$lines")"
+done
+echo
+
+eval cd $currentdir # set the directory in the current shell
+
+coloredLog $(pwd) "1;44"
+
 choice
+
+done
+
+unset locations workspaces

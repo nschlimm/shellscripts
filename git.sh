@@ -1,5 +1,5 @@
 #!/bin/sh
-supergithome=~/Personal
+supergithome=~/workspaces/personal/shellscripts
 trackchoices=$1
 source $supergithome/flexmenu.sh
 
@@ -185,7 +185,7 @@ function deleteBranch() {
 }
 
 function mergeSourceToTarget(){
-              git branch
+              git branch --all
             echo "Enter merge target branch"
             read target
             echo "Enter merge source branch"

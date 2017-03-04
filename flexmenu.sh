@@ -4,9 +4,14 @@
 rawdatafilename=rawdata.txt
 summaryfilename=summary.txt
 menuitemsfilename=menugroups.txt
-rawdatahome=~/Personal/
+rawdatahome=$supergithome/
 actualmenu=
-waitonexit
+
+function coloredLog () { # logentry ; color code
+  export GREP_COLOR="$2"
+  echo "$1" | grep --color ".*"
+  export GREP_COLOR='01;31'
+}
 
 function menuInit () {
   touch $rawdatahome$rawdatafilename
@@ -259,3 +264,22 @@ function quit () {
        break
 }
 
+# read config to global arrays
+INPUT=$supergithome/.sgitconfig
+[ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 99; }
+i=0
+while read configline; do
+   if echo "$configline" | grep -q "\[.*\]"; then
+     configsection=$(echo "$configline" | grep -o "\[.*\]")
+     configsectioname=${configsection:1:${#configsection}-2}
+     declare -a -x "$configsectioname"
+     i=0
+     continue
+   fi
+   if [ -n "$configline" ]; then
+      declare "$configsectioname[i]=$configline"
+   fi
+   ((i++))
+done < $INPUT
+
+waitonexit
