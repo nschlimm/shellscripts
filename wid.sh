@@ -6,6 +6,7 @@ options=( "Versteckte Dateien in Finder sehen"
           "Difftool"
           "Mergetool"
           "git-extras"
+          "pip"
           "Quit")
 select opt in "${options[@]}"
 do
@@ -47,6 +48,14 @@ do
             ;;
         "git-extras")
             brew install git-extras
+            ;;
+        "pip")
+            sudo easy_install pip
+            ;;
+        "Unhide directories in Finder")
+            echo "Directory:"
+            read dirn
+            sudo chflags nohidden $dirn
             ;;
         "Quit")
             break

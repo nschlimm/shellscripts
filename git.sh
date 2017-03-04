@@ -198,15 +198,7 @@ function workingDiffs() {
 }
 
 function setUpstream() {
-   git branch --set-upstream-to=origin/$actual
-}
-
-function stash() {
-            git stash
-}
-
-function pop() {
-            git stash pop
+   git push --set-upstream origin $actual
 }
 
 function localGitConfig() {
@@ -330,8 +322,6 @@ echo
 submenuHead "Other usefull actions:"
 menuPunkt s "Working with diffs" workingDiffs
 menuPunkt t "Interactively staging/unstaging files" interactiveStage
-menuPunkt u "Stash: save local changes and bring head to working dir" stash
-menuPunkt v "Stash pop: revert last stash" pop
 menuPunkt w "Atlassian's view" atlassiansView
 echo
 submenuHead "Git admin actions:"
