@@ -191,7 +191,6 @@ function selectItem () {
   fi
   if [ -z "$linenumber" ]; then
      selected=""
-     echo "this"
    else
      selected=$(eval "$listkommando" | sed -n ${linenumber}p)
      echo $selected

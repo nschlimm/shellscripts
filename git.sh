@@ -26,18 +26,28 @@ function pushActual() {
      echo "... you seem to be on a detached head state ... can't push ..."
   else
     echo "... your HEAD is attached to $actual ..."
-    importantLog "Checking for updates from origin/$actual"
-    if git diff $actual origin/$actual | grep -q ".*"; then
-       echo "... found diff between $actual and origin/$actual ..."
-       executeCommand "git diff --name-status $actual origin/$actual"
-       read -p "Merge (y/n)? " -n 1 -r
-       echo    # (optional) move to a new line
-       if [[ $REPLY =~ ^[Yy]$ ]]; then
-          executeCommand "git merge origin/$actual"
-       fi
+    mergeChanges
+    addAllUntracked
+    commitChanges
+    pushChanges
+  fi
+}
+
+function pushChanges () {
+    importantLog "Checking for stuff to push to origin/$actual"
+    if git push --dry-run | grep ".*"; then
+      echo "... found commited updates in $actual waiting for push to origin/$actual ..."
+      read -p "Push (y/n)? " -n 1 -r
+      echo
+      if [[ $REPLY =~ ^[Yy]$ ]]; then #push
+         executeCommand "git push -u origin $actual"
+      fi
     else
-       echo "... nothing to merge ... up to date"
+      echo "... nothing to push ..."
     fi
+}
+
+function addAllUntracked () {
     importantLog "Checking for untracked files in the working tree"
     # check to see if untracked files are in working tree
     if git ls-files --others --exclude-standard | grep -q ".*"; then
@@ -51,26 +61,32 @@ function pushActual() {
     else
       echo "... no untracked files present ..."
     fi
-    commitChanges
-    importantLog "Checking for stuff to push to origin/$actual"
+}
+
+function mergeChanges () {
+    importantLog "Checking for updates from origin/$actual"
     if git diff $actual origin/$actual | grep -q ".*"; then
-      echo "... found commited updates in $actual waiting for push to origin/$actual ..."
-      read -p "Push (y/n)? " -n 1 -r
-      echo
-      if [[ $REPLY =~ ^[Yy]$ ]]; then #push
-         executeCommand "git push -u origin $actual"
-      fi
+       echo "... found diff between $actual and origin/$actual ..."
+       if git status | grep "Your branch is ahead"; then
+          echo "... your local branch is ahead of origin/$actual ... nothing to merge"
+        else
+          executeCommand "git diff --name-status $actual origin/$actual"
+          read -p "Merge (y/n)? " -n 1 -r
+          echo    # (optional) move to a new line
+          if [[ $REPLY =~ ^[Yy]$ ]]; then
+             executeCommand "git merge origin/$actual"
+          fi
+        fi
     else
-      echo "... nothing to push ..."
+       echo "... nothing to merge ... up to date"
     fi
-  fi
 }
 
 function commitChanges () {
     importantLog "Checking for stuff to commit from the working tree"
-    if git status -s | grep -q ".*"; then
+    if git status -s -uno| grep -q ".*"; then
       echo "... found updates on tracked files in working tree ..."
-      diffDrillDownAdvanced "git status -s" " .*" HEAD
+      diffDrillDownAdvanced "git status -s -uno" " .*" HEAD
       read -p "Commit the updates (y/n)? " -n 1 -r
       echo    # (optional) move to a new line
       if [[ $REPLY =~ ^[Yy]$ ]]; then
