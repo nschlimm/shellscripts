@@ -4,10 +4,10 @@ source $supergithome/flexmenu.sh
 
 function toDir () {
 	currentdir="$1"
+	eval cd "$1"
 	nowaitonexit
 }
 
-while true; do
 clear
 thekeys="abcdefghijklmnoprstuvwxyz"
 declare -x keycounter=0
@@ -53,7 +53,5 @@ eval cd $currentdir # set the directory in the current shell
 coloredLog $(pwd) "1;44"
 
 choice
-
-done
 
 unset locations workspaces

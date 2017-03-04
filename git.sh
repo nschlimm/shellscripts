@@ -274,7 +274,7 @@ function atlassiansView() {
 }
 
 function changeProject () {
-  . ~/Personal/fl.sh
+  . $supergithome/fl.sh
   nowaitonexit
 }
 
