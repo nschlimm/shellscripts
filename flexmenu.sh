@@ -268,6 +268,7 @@ function quit () {
 INPUT=$supergithome/.sgitconfig
 [ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 99; }
 i=0
+configlines=$(cat $INPUT)
 while read configline; do
    if echo "$configline" | grep -q "\[.*\]"; then
      configsection=$(echo "$configline" | grep -o "\[.*\]")
@@ -280,6 +281,6 @@ while read configline; do
       declare "$configsectioname[i]=$configline"
    fi
    ((i++))
-done < $INPUT
+done <<< "$(echo -e "$configlines")"
 
 waitonexit
