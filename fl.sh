@@ -57,7 +57,7 @@ if [ -z ${gitlocations+x} ]; then
    done
 fi
 eval cd "$priorlocation" # return to previous location
-# prin out git location cache
+# print out git location cache
 submenuHead "GIT repos inside workspaces:"
 for (( i = 0; i < ${#gitlocations[@]}; i++ )); do
     arrIN=(${gitlocations[$i]})

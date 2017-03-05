@@ -5,6 +5,7 @@ rawdatafilename=rawdata.txt
 summaryfilename=summary.txt
 menuitemsfilename=menugroups.txt
 rawdatahome=$supergithome/
+configfilename=.sgitconfig
 actualmenu=
 
 function coloredLog () { # logentry ; color code
@@ -265,7 +266,7 @@ function quit () {
 }
 
 # read config to global arrays
-INPUT=$supergithome/.sgitconfig
+INPUT=$supergithome/$configfilename
 [ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 99; }
 i=0
 configlines=$(cat $INPUT)

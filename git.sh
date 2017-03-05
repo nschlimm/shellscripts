@@ -1,7 +1,7 @@
 #!/bin/sh
 supergithome=~/workspaces/personal/shellscripts
-trackchoices=$1
 source $supergithome/flexmenu.sh
+trackchoices=$1
 
 function analyzeWorkingDir (){
    wstat=$(git diff HEAD --shortstat) # analyze local dir working status vs. actual checkout
