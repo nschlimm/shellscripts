@@ -12,7 +12,7 @@ function purgDirCache () {
 }
 
 clear
-thekeys="abcdefghijklmnoprstuvwxyz"
+thekeys=($(echo {a..z}))
 declare -x keycounter=0
 menuInit "Favorite locations"
 submenuHead "Locations:"
@@ -21,7 +21,7 @@ if [ -n ${locations+x} ]; then
 	do
 		locationname=$(echo "$j" | cut -f1 -d'=')
 		locationdir=$(echo "$j" | cut -f2 -d'=')
-		menuPunkt "${thekeys:${keycounter}:1}" "$locationname" "toDir $locationdir"
+		menuPunkt "${thekeys[$keycounter]}" "$locationname" "toDir $locationdir"
        ((keycounter++))
     done
 fi
@@ -32,7 +32,7 @@ if [ -n ${workspaces+x} ]; then
 	do
 		locationname=$(echo "$j" | cut -f1 -d'=')
 		locationdir=$(echo "$j" | cut -f2 -d'=')
-		menuPunkt "${thekeys:${keycounter}:1}" "$locationname" "toDir $locationdir"
+		menuPunkt "${thekeys[$keycounter]}" "$locationname" "toDir $locationdir"
         ((keycounter++))
     done
 fi
@@ -50,7 +50,7 @@ if [ -z ${gitlocations+x} ]; then
    	  lines=$(eval find $locationdir -name ".git")
       while read line; do
        	completelocation=${line::${#line}-5}
-       	gitlocations[$index]="${thekeys:${keycounter}:1} $completelocation toDir $completelocation"
+       	gitlocations[$index]="${thekeys[$keycounter]} $completelocation toDir $completelocation"
         ((keycounter++))
         ((index++))
       done <<< "$(echo -e "$lines")"
