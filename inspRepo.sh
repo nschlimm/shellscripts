@@ -22,6 +22,15 @@ function authorDiffFile () {
     executeCommand "git log --author=$author -p $selected"
 }
 
+function oneCommit () {
+	echo "Commits since [yyyy-mm-dd]:"
+	read sincedate
+	git log --since="\{${sincedate}\}T00:00:00-00:00" --oneline
+	echo "Enter commit:"
+	read commit
+	git diff $commit^ $commit --name-status
+}
+
 while ${continuemenu:=true}; do
 clear
 menuInit "Inspecting repositories"
@@ -35,6 +44,7 @@ menuPunkt d "Display patch representing each commit" "git log -p"
 menuPunkt e "Search for commits by a particular author" listAuthorCommits
 menuPunkt f "Only display commits that include the specified file" listFileCommits
 menuPunkt g "Display a full diff of all the changes someone has made to a file" authorDiffFile
+menuPunkt h "Display contents of one commit" oneCommit
 echo
 choice
 done

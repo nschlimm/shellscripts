@@ -64,7 +64,7 @@ function actualHeadbranchHead () {
 function showCommits () {
     echo "How many commits?"
     read hmany
-    git log --graph --pretty=format:'%Cred%h%Creset %ad: %C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -n ${hmany:-100} --date=short
+    git log --graph --pretty=format:'%Cred%h%Creset %ad: %C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -n ${hmany:-100} --date=iso
 }
 
 function diffDate () {
