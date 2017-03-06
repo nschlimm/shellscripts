@@ -79,9 +79,10 @@ function diffDate () {
    newestcommit=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" | head -1 | cut -f2 -d' ') # the newest commit in the branch (actual head state)
    echo "latest commit in this branch hstory: $newestcommit"
    newestcommitdate=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" | head -1 | cut -f3 -d' ') # the newest commit date
-   coloredLog "comparing commit $commitpriortolast made on $commitdatepriortolast against $newestcommit made on $newestcommitdate"
+   coloredLog "changes since $sincedate 12 a.m. / midnight: comparing commit $commitpriortolast made on $commitdatepriortolast against $newestcommit (latest commit) made on $newestcommitdate"
    diffDrillDownAdvanced "git diff --name-status $commitpriortolast $newestcommit" "[ ].*$" "$commitpriortolast" "$newestcommit"
    #git log --oneline | grep --color -E 'Add slack integration to pipeline|$'
+   # why git log is so strange: http://stackoverflow.com/questions/14618022/how-does-git-log-since-count why 
 }
 
 git fetch --all
