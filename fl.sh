@@ -4,7 +4,7 @@ source $supergithome/flexmenu.sh
 
 function toDir () {
 	vars="$@" # all splitted words back to one var
-	eval cd "${vars// /\ }" # escape spaces
+	eval cd "${vars// /\\ }" # escape spaces
 	nowaitonexit
 }
 
@@ -58,7 +58,7 @@ if [ -z ${gitlocations+x} ]; then
       done <<< "$(echo -e "$lines")"
    done
 fi
-eval cd "$priorlocation" # return to previous location
+eval cd "${priorlocation// /\\ }" # return to previous location
 # print out git location cache
 submenuHead "GIT repos inside workspaces:"
 for (( i = 0; i < ${#gitlocations[@]}; i++ )); do
@@ -72,7 +72,7 @@ menuPunkt X "Purge git dir cache" purgDirCache
 echo
 menuPunkt q "Quit" quit
 echo
-coloredLog $(pwd) "1;44"
+coloredLog "$(pwd)" "1;44"
 
 choice
 

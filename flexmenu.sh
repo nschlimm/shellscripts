@@ -49,7 +49,6 @@ function callKeyFunktion () {
               logCommand "$1"
             fi
             clear
-            echo "here $method"
             $method
             return 1
          fi
