@@ -1,6 +1,4 @@
 #!/bin/sh
-supergithome=~/Personal
-source $supergithome/flexmenu.sh
 
 # all your menu actions here
 
@@ -24,7 +22,7 @@ function authorDiffFile () {
     executeCommand "git log --author=$author -p $selected"
 }
 
-while true; do
+while ${continuemenu:=true}; do
 clear
 menuInit "Inspecting repositories"
 submenuHead "State of working tree and stage (git status)"
@@ -40,3 +38,4 @@ menuPunkt g "Display a full diff of all the changes someone has made to a file" 
 echo
 choice
 done
+noterminate

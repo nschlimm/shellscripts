@@ -1,6 +1,4 @@
 #!/bin/sh
-supergithome=~/Personal
-source $supergithome/flexmenu.sh
 
 function changeBlame () {
 	git log --pretty=format:'%Cred%h%Creset | %Cgreen%ad%Creset | %s %C(yellow)%d%Creset %C(bold blue)[%an]%Creset %Cgreen(%cr)%Creset' --graph --date=short
@@ -40,7 +38,7 @@ function obliberate () {
 	
 }
 
-while true; do
+while ${continuemenu:=true}; do
 clear
 menuInit "Git extras menu"
 submenuHead "Project information"
@@ -65,3 +63,4 @@ menuPunkt s "Setup git repository in current dir" "git setup"
 echo
 choice
 done
+noterminate

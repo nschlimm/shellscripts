@@ -83,6 +83,7 @@ function diffDate () {
    diffDrillDownAdvanced "git diff --name-status $commitpriortolast $newestcommit" "[ ].*$" "$commitpriortolast" "$newestcommit"
    #git log --oneline | grep --color -E 'Add slack integration to pipeline|$'
    # why git log is so strange: http://stackoverflow.com/questions/14618022/how-does-git-log-since-count why 
+   # alternative: git diff 'HEAD@{2017-03-03T00:00:00}' HEAD --name-status | nl
 }
 
 git fetch --all
