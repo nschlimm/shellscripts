@@ -57,6 +57,9 @@ do
             read dirn
             sudo chflags nohidden $dirn
             ;;
+            "Sublime callable from command line")
+            ln -s /Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl /usr/local/bin/.
+            ;;
         "Quit")
             break
             ;;

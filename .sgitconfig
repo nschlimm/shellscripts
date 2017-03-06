@@ -5,3 +5,4 @@ community=~/workspaces/community
 
 [locations]
 mavenrepohome=~/.m2
+sublimesnippets=/Users/niklasschlimm/Library/Application\ Support/Sublime\ Text\ 3/Packages/User

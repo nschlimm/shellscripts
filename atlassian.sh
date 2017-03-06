@@ -1,7 +1,6 @@
 #!/bin/sh
-supergithome=~/Personal
-source flexmenu.sh
-trackchoices=$1
+
+# submenus
 
 function settingUp () {
 	source $supergithome/atSettingUp.sh
@@ -19,7 +18,7 @@ function inspectingRepos () {
 }
 
 
-while true; do
+while ${continuemenu:=true}; do
 clear
 menuInit "Atlassian's View"
 echo "Atlassians view on GIT, https://de.atlassian.com/git/tutorials"
@@ -47,3 +46,4 @@ echo
 showStatus
 choice
 done
+noterminate

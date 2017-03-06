@@ -1,6 +1,4 @@
 #!/bin/sh
-supergithome=~/Personal
-source flexmenu.sh
 
 function atLocalGit () {
 
@@ -73,7 +71,7 @@ function defineMergeTool () {
     git config --global merge.tool $editor
 }
 
-while true; do
+while ${continuemenu:=true}; do
 clear
 menuInit "Repositories"
 submenuHead "Setting up repositories"
@@ -93,3 +91,4 @@ menuPunkt k "Open local config" openLocalConfig
 
 choice
 done
+noterminate

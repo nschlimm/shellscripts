@@ -1,1 +1,28 @@
+<<<<<<< Updated upstream
 test
+=======
+atIgnore.sh
+atSaveChanges.sh
+atSettingUp.sh
+atlassian.sh
+colors.sh
+diff.sh
+fl.sh
+flexmenu.sh
+git.sh
+gitExtras.sh
+gitn.sh
+inspRepo.sh
+menu.sh
+menugroups.txt
+menugroups.txt.bak
+mh.sh
+pr.sh
+rawdata.txt
+summary.txt
+summary.txt.bak
+test.sh
+test.txt
+us.sh
+wid.sh
+>>>>>>> Stashed changes

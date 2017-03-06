@@ -3,13 +3,16 @@ supergithome=~/workspaces/personal/shellscripts
 source $supergithome/flexmenu.sh
 
 function toDir () {
-	eval cd "$1"
+	vars="$@" # all splitted words back to one var
+	eval cd "${vars// /\ }" # escape spaces
 	nowaitonexit
 }
 
 function purgDirCache () {
 	unset gitlocations
 }
+
+initConfig
 
 clear
 thekeys=($(echo {a..z}))
@@ -22,7 +25,7 @@ if [ -n ${locations+x} ]; then
 		locationname=$(echo "$j" | cut -f1 -d'=')
 		locationdir=$(echo "$j" | cut -f2 -d'=')
 		menuPunkt "${thekeys[$keycounter]}" "$locationname" "toDir $locationdir"
-       ((keycounter++))
+        ((keycounter++))
     done
 fi
 echo
@@ -41,7 +44,6 @@ uncached=false
 priorlocation=$(pwd) # remember actual location
 if [ -z ${gitlocations+x} ]; then
    uncached=true
-   declare -a gitlocations
    index=0
    for j in "${workspaces[@]}"
    do
@@ -67,6 +69,8 @@ if $uncached; then coloredLog "NEW" "1;42"; else coloredLog "CACHED" "1;42"; fi
 echo
 submenuHead "Shortcuts"
 menuPunkt X "Purge git dir cache" purgDirCache
+echo
+menuPunkt q "Quit" quit
 echo
 coloredLog $(pwd) "1;44"
 

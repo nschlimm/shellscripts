@@ -70,6 +70,8 @@ function mergeChanges () {
        if git status | grep "Your branch is ahead"; then
           echo "... your local branch is ahead of origin/$actual ... nothing to merge"
         else
+          echo "... your local branch is behind of origin/$actual ... recommend merge !"
+          diffDrillDownAdvanced "git diff --name-status $actual origin/$actual" " .*" "$actual" "origin/$actual"
           executeCommand "git diff --name-status $actual origin/$actual"
           read -p "Merge (y/n)? " -n 1 -r
           echo    # (optional) move to a new line
@@ -208,11 +210,6 @@ function showBranchHisto(){
             git log --pretty=format:'%Cred%h%Creset | %Cgreen%ad%Creset | %s %C(yellow)%d%Creset %C(bold blue)[%an]%Creset %Cgreen(%cr)%Creset' --graph --date=short
 }
 
-function workingDiffs() {
-  . $supergithome/diff.sh
-  nowaitonexit
-}
-
 function setUpstream() {
    git push --set-upstream origin $actual
 }
@@ -249,10 +246,6 @@ function gitIgnore() {
             vim .gitignore
 }
 
-function makeQuit(){
-    return
-}
-
 function undoReset () {
   git reflog --date=iso
   echo "Choose commit to reset:"
@@ -266,16 +259,6 @@ function undoReset () {
 
 function interactiveStage () {
    git add -i
-}
-
-function atlassiansView() {
-  . $supergithome/atlassian.sh
-  nowaitonexit
-}
-
-function changeProject () {
-  . $supergithome/fl.sh
-  nowaitonexit
 }
 
 function changeBranch () {
@@ -305,6 +288,23 @@ function fetchAllStuff () {
   done
 }
 
+# submenus
+
+function workingDiffs() {
+  source $supergithome/diff.sh
+  nowaitonexit
+}
+
+function atlassiansView() {
+  source $supergithome/atlassian.sh
+  nowaitonexit
+}
+
+function changeProject () {
+  source $supergithome/fl.sh
+  nowaitonexit
+}
+
 function gitExtras () {
   source $supergithome/gitExtras.sh
   nowaitonexit
@@ -312,7 +312,7 @@ function gitExtras () {
 
 git fetch --all 2> /dev/null
 
-while true; do
+while ${continuemenu:=true}; do
 clear
 menuInit "Super GIT Home"
 submenuHead "Working with remotes:"
@@ -357,3 +357,4 @@ echo
 showStatus
 choice
 done
+echo "bye, bye, homie!"

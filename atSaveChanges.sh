@@ -1,6 +1,4 @@
 #!/bin/sh
-supergithome=~/Personal
-source flexmenu.sh
 
 function interStage () {
 	git add -p
@@ -133,7 +131,7 @@ function ignoreMenu () {
 	nowaitonexit
 }
 
-while true; do
+while ${continuemenu:=true}; do
 clear
 menuInit "Saving changes"
 submenuHead "Adding changes to stage:"
@@ -176,3 +174,4 @@ echo
 showStatus
 choice
 done
+noterminate

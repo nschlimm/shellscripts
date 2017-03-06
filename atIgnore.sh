@@ -1,6 +1,4 @@
 #!/bin/sh
-supergithome=~/Personal
-source /flexmenu.sh
 
 # all your menu actions here
 
@@ -21,7 +19,7 @@ function defineIgnoreException () {
 }
 
 
-while true; do
+while ${continuemenu:=true}; do
 clear
 menuInit "Ignore menu"
 submenuHead "Ignoring files:"
@@ -39,3 +37,4 @@ menuPunkt l "List ignored files" "git ls-files --others -i --exclude-standard"
 echo
 choice
 done
+noterminate

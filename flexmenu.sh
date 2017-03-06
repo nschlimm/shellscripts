@@ -44,20 +44,17 @@ function callKeyFunktion () {
        keys=${i:0:1}
          if [ "$1" == "$keys" ]
            then
-            clear
             method=$(echo "$i" | cut -f3 -d#)
             if [[ $trackchoices == 1 ]]; then
               logCommand "$1"
             fi
+            clear
+            echo "here $method"
             $method
-            echo
-            if $waitstatus; then
-               read -p $'\n<Press any key to return>' -n 1 -r
-             else
-              waitonexit # back to default after method execution
-            fi
+            return 1
          fi
    done
+   return 5
 }
 
 function nowaitonexit () {
@@ -242,6 +239,9 @@ function diffDrillDownAdvanced () { # list kommando; regexp to select filename f
 
 }
 
+function noterminate () { continuemenu=true; }
+function terminate () { continuemenu=false; }
+
 function choice () {
   echo
   echo "Press 'q' to quit"
@@ -249,39 +249,52 @@ function choice () {
   read -p "Make your choice: " -n 1 -r
   echo
 
-  case $REPLY in 
-    "q" )
-       echo "bye, bye, homie!"
-       break
-      ;;
-  esac
-  
-  callKeyFunktion $REPLY
+  if [[ $REPLY == "q" ]]; then
+       terminate
+  else
+    callKeyFunktion $REPLY
+    if [[ $? -gt 1 ]]; then
+      coloredLog "Huh ($REPLY)?" "1;31"
+    fi
+    if $waitstatus; then
+      read -p $'\n<Press any key to return>' -n 1 -r
+    else
+      waitonexit # back to default after method execution
+    fi
+  fi
 
 }
 
 function quit () {
        echo "bye bye, homie!"
-       break
+       nowaitonexit
+       break #2> /dev/null
 }
 
-# read config to global arrays
-INPUT=$supergithome/$configfilename
-[ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 99; }
-i=0
-configlines=$(cat $INPUT)
-while read configline; do
-   if echo "$configline" | grep -q "\[.*\]"; then
-     configsection=$(echo "$configline" | grep -o "\[.*\]")
-     configsectioname=${configsection:1:${#configsection}-2}
-     declare -a -x "$configsectioname"
-     i=0
-     continue
-   fi
-   if [ -n "$configline" ]; then
-      declare "$configsectioname[i]=$configline"
-   fi
-   ((i++))
-done <<< "$(echo -e "$configlines")"
+function exitGently () {
+       echo "bye bye, homie!"
+       nowaitonexit
+       exit 1
+}
+
+function initConfig () {
+   # read config to global arrays
+   INPUT=$supergithome/$configfilename
+   [ ! -f $INPUT ] && { echo "$INPUT file not found"; exit 99; }
+   i=0
+   configlines=$(cat $INPUT)
+   while read configline; do
+      if echo "$configline" | grep -q "\[.*\]"; then
+        configsection=$(echo "$configline" | grep -o "\[.*\]")
+        configsectioname=${configsection:1:${#configsection}-2}
+        i=0
+        continue
+      fi
+      if [ -n "$configline" ]; then
+         eval "$configsectioname[i]='$configline'"
+      fi
+      ((i++))
+   done <<< "$(echo -e "$configlines")"
+}
 
 waitonexit

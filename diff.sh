@@ -1,6 +1,4 @@
 #!/bin/sh
-supergithome=~/Personal
-source $supergithome/flexmenu.sh
 
 function numberedList () {
   kommando="$1"
@@ -8,8 +6,8 @@ function numberedList () {
 }
 
 function headHead () {
-   importantLog "Comparing $actual HEAD to $actual/origin HEAD"
-   diffDrillDownAdvanced "git diff --name-status $actual origin/$actual" "[ ].*$" "$actual" "origin/$actual"
+     importantLog "Comparing $actual HEAD to $actual/origin HEAD"
+     diffDrillDownAdvanced "git diff --name-status $actual origin/$actual" "[ ].*$" "$actual" "origin/$actual"
 }
 
 function dirHead () {
@@ -78,26 +76,25 @@ function diffDate () {
 }
 
 git fetch --all
-
-while true; do
+while ${continuemenu:=true}; do
 clear
 menuInit "Working with diffs"
 echo "Note: GIT diff cann compare three locations with each other: the tree (your working directory), the stage, the repository."
 submenuHead "Different diff options:"
-menuPunkt a "actual HEAD vs. origin/actual branch HEAD  -> repository vs. repository" headHead
-menuPunkt b "actual working dir   vs. HEAD              -> tree vs. repository" dirHead
-menuPunkt c "actual working dir   vs. other commits     -> tree vs. repository" treeCommit
-menuPunkt d "actual working dir   vs. stage             -> tree vs. index" treeStage
-menuPunkt e "commit               vs. commit            -> repository vs. repository" commitCommit
-menuPunkt f "branch head          vs. branch head       -> repository vs. repository" branchBranch
-menuPunkt g "actual branch head   vs. branch head       -> repository vs. repositoty" actualHeadbranchHead
+menuPunkt a "actual HEAD vs. newer origin/actual branch HEAD  -> repository vs. repository" headHead
+menuPunkt b "actual working dir   vs. HEAD                    -> tree vs. repository" dirHead
+menuPunkt c "actual working dir   vs. other commits           -> tree vs. repository" treeCommit
+menuPunkt d "actual working dir   vs. stage                   -> tree vs. index" treeStage
+menuPunkt e "commit               vs. commit                  -> repository vs. repository" commitCommit
+menuPunkt f "branch head          vs. branch head             -> repository vs. repository" branchBranch
+menuPunkt g "actual branch head   vs. branch head             -> repository vs. repositoty" actualHeadbranchHead
 echo
 submenuHead "Specific diffs:"
 menuPunkt k "Diff since date" diffDate
 echo
 submenuHead "Other usefull stuff here:"
 menuPunkt h "show commits" showCommits
-menuPunkt q "quit" quit
 echo
 choice
 done
+noterminate
