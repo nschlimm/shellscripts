@@ -7,7 +7,12 @@ function numberedList () {
 
 function headHead () {
      importantLog "Comparing $actual HEAD to $actual/origin HEAD"
-     diffDrillDownAdvanced "git diff --name-status $actual origin/$actual" "[ ].*$" "$actual" "origin/$actual"
+     if git status | grep "Your branch is behind"; then
+       diffDrillDownAdvanced "git diff --name-status $actual origin/$actual" "[ ].*$" "$actual" "origin/$actual"
+     fi
+     if git status | grep "Your branch is ahead"; then
+       diffDrillDownAdvanced "git diff --name-status origin/$actual $actual" "[ ].*$" "origin/$actual" "$actual"
+     fi
 }
 
 function dirHead () {
@@ -41,9 +46,9 @@ function commitCommit () {
 function branchBranch () {
    echo "Branches"
    git branch --all
-   echo "(a) Enter 'branch' name"
+   echo "(a) Enter baseline branch name:"
    read cnamea
-   echo "(b) Enter second branch name"
+   echo "(b) Enter second branch name to compare:"
    read cnameb
    diffDrillDownAdvanced "git diff --name-status $cnamea $cnameb" "[ ].*$" "$cnamea" "$cnameb"	
 }
@@ -51,7 +56,7 @@ function branchBranch () {
 function actualHeadbranchHead () {
     echo "Branches"
     git branch --all
-    echo "Enter 'branch' name"
+    echo "Enter branch name to compare against $actual head"
     read cnamea
     diffDrillDownAdvanced "git diff --name-status $actual $cnamea" "[ ].*$" "$actual" "$cnamea"  
 }
@@ -66,13 +71,17 @@ function diffDate () {
    echo "Enter date since in [yyyy-mm-dd]:"
    read sincedate
    lastcommitdate=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" --since "$sincedate 00:00:00" | cut -f3 -d' ' | tail -1) # the last commit date since the date given
-   echo "last date: $lastcommitdate"
+   echo "first commit date equal or after since date: $lastcommitdate"
    commitpriortolast=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" | grep "$lastcommitdate" -A 1 | tail -1 | cut -f2 -d' ') # commit before the last commit in period
+   echo "next commit date prior since date: $commitpriortolast"
    commitdatepriortolast=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" | grep "$lastcommitdate" -A 1 | tail -1 | cut -f3 -d' ') # commit date before the last commit in period
-   echo "commit prior to last date: $commitpriortolast ... on: $commitdatepriortolast"
-   newestcommit=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" | head -1 | cut -f2 -d' ')
-   echo "latest commit: $newestcommit"
+   echo "next commit date prior since date: $commitpriortolast ... on: $commitdatepriortolast"
+   newestcommit=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" | head -1 | cut -f2 -d' ') # the newest commit in the branch (actual head state)
+   echo "latest commit in this branch hstory: $newestcommit"
+   newestcommitdate=$(git log --pretty=format:'%h %ad' --graph --date=format:"%Y-%m-%d" | head -1 | cut -f3 -d' ') # the newest commit date
+   coloredLog "comparing commit $commitpriortolast made on $commitdatepriortolast against $newestcommit made on $newestcommitdate"
    diffDrillDownAdvanced "git diff --name-status $commitpriortolast $newestcommit" "[ ].*$" "$commitpriortolast" "$newestcommit"
+   #git log --oneline | grep --color -E 'Add slack integration to pipeline|$'
 }
 
 git fetch --all
@@ -81,13 +90,13 @@ clear
 menuInit "Working with diffs"
 echo "Note: GIT diff cann compare three locations with each other: the tree (your working directory), the stage, the repository."
 submenuHead "Different diff options:"
-menuPunkt a "actual HEAD vs. newer origin/actual branch HEAD  -> repository vs. repository" headHead
-menuPunkt b "actual working dir   vs. HEAD                    -> tree vs. repository" dirHead
-menuPunkt c "actual working dir   vs. other commits           -> tree vs. repository" treeCommit
-menuPunkt d "actual working dir   vs. stage                   -> tree vs. index" treeStage
-menuPunkt e "commit               vs. commit                  -> repository vs. repository" commitCommit
-menuPunkt f "branch head          vs. branch head             -> repository vs. repository" branchBranch
-menuPunkt g "actual branch head   vs. branch head             -> repository vs. repositoty" actualHeadbranchHead
+menuPunkt a "actual HEAD          vs. origin/actual branch HEAD  -> repository vs. repository" headHead
+menuPunkt b "actual working dir   vs. HEAD                       -> tree vs. repository" dirHead
+menuPunkt c "actual working dir   vs. other commits              -> tree vs. repository" treeCommit
+menuPunkt d "actual working dir   vs. stage                      -> tree vs. index" treeStage
+menuPunkt e "commit               vs. commit                     -> repository vs. repository" commitCommit
+menuPunkt f "branch head          vs. branch head                -> repository vs. repository" branchBranch
+menuPunkt g "actual branch head   vs. branch head                -> repository vs. repositoty" actualHeadbranchHead
 echo
 submenuHead "Specific diffs:"
 menuPunkt k "Diff since date" diffDate
@@ -95,6 +104,7 @@ echo
 submenuHead "Other usefull stuff here:"
 menuPunkt h "show commits" showCommits
 echo
+showStatus
 choice
 done
 noterminate
