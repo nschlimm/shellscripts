@@ -1,9 +1,9 @@
 #!/bin/sh
 supergithome=~/workspaces/personal/shellscripts
 source $supergithome/flexmenu.sh
-
+		
 function toDir () {
-	vars="$@" # all splitted words back to one var
+	vars="$*" # all splitted words back to one var
 	eval cd "${vars// /\\ }" # escape spaces
 	nowaitonexit
 }

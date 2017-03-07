@@ -49,6 +49,7 @@ function callKeyFunktion () {
               logCommand "$1"
             fi
             clear
+            coloredLog "$method" '1;37;44'
             $method
             return 1
          fi
