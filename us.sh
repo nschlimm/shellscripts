@@ -7,6 +7,7 @@ select choice in \
     "Add path to path variable" \
     "Search for a resource in jar files" \
     "Quick search for a resource in jar files" \
+    "Who uses port xy?" \
     "Quit"
 
 do
@@ -52,6 +53,12 @@ do
 
         ;;
         7)
+            echo "Enter port:"
+            read portno
+            lsof -n -i:$portno | grep LISTEN
+            break
+        ;;
+        8)
             break
         ;;
     esac

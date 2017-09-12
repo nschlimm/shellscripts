@@ -7,6 +7,7 @@ options=( "Versteckte Dateien in Finder sehen"
           "Mergetool"
           "git-extras"
           "pip"
+          "npm & nvm"
           "Quit")
 select opt in "${options[@]}"
 do
@@ -60,6 +61,9 @@ do
             "Sublime callable from command line")
             ln -s /Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl /usr/local/bin/.
             ;;
+        "npm & nvm")
+            brew install npm && brew install nvm
+            # vim .bashprofile
         "Quit")
             break
             ;;

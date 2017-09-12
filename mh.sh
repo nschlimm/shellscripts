@@ -14,6 +14,7 @@ select choice in \
     "Remove reresolve all dependencies of Project from local Repository" \
     "List repositories of Project" \
     "Download sources" \
+    "Build with dependencies" \
     "Quit"
 
 do
@@ -34,7 +35,7 @@ do
         ;;
             
         5)
-            echo "full qualified source file name:"
+            echo "relative file name:"
             read fname
             echo "local maven repo group id"
             read fgroupid
@@ -87,6 +88,9 @@ do
             mvn dependency:sources
         ;;
         14)
+            mvn clean compile assembly:single
+            ;;
+        15)
             echo "Okay, .."
             break
             ;;
