@@ -8,6 +8,7 @@ select choice in \
     "Search for a resource in jar files" \
     "Quick search for a resource in jar files" \
     "Who uses port xy?" \
+    "Find file in directory" \
     "Quit"
 
 do
@@ -59,6 +60,12 @@ do
             break
         ;;
         8)
+            echo "Search pattern:"
+            read pattern
+            find . -iname "$pattern"
+            break
+        ;;
+        9)
             break
         ;;
     esac
