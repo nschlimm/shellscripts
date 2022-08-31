@@ -86,7 +86,8 @@ do
         ;;
         13)
             mvn dependency:sources
-        ;;
+            mvn eclipse:eclipse -DdownloadSources=true
+            ;;
         14)
             mvn clean compile assembly:single
             ;;
